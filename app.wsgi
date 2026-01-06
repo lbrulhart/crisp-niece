@@ -228,18 +228,18 @@ def application(environ, start_response):
 
     # Parse query string for complexity level and separator
     query_string = environ.get('QUERY_STRING', '')
-    complexity = 'short'  # default
+    complexity = 'long'  # default
     if 'level=very_short' in query_string:
         complexity = 'very_short'
+    elif 'level=short' in query_string:
+        complexity = 'short'
     elif 'level=medium' in query_string:
         complexity = 'medium'
-    elif 'level=long' in query_string:
-        complexity = 'long'
     elif 'level=extralong' in query_string:
         complexity = 'extralong'
 
     # Parse separator
-    separator = ' '  # default (Space)
+    separator = '-'  # default (Dash)
     if 'sep=space' in query_string:
         separator = ' '
     elif 'sep=dash' in query_string:
@@ -250,23 +250,23 @@ def application(environ, start_response):
         separator = None
 
     # Parse add_number option
-    add_number = 'num=yes' in query_string
+    add_number = 'num=no' not in query_string  # default yes
 
     # Parse capitalization option
     capitalize_first = 'cap=no' not in query_string  # default yes
 
     # Parse terminator option
-    terminator_type = 'none'  # default none
+    terminator_type = 'symbol'  # default symbol
     if 'term=period' in query_string:
         terminator_type = 'period'
-    elif 'term=symbol' in query_string:
-        terminator_type = 'symbol'
+    elif 'term=none' in query_string:
+        terminator_type = 'none'
 
     # Build URL parameters
     sep_param = 'space' if separator == ' ' else ('dash' if separator == '-' else ('camel' if separator == '' else 'none'))
-    num_param = '&num=yes' if add_number else ''
+    num_param = '' if add_number else '&num=no'
     cap_param = '' if capitalize_first else '&cap=no'
-    term_param = '&term=symbol' if terminator_type == 'symbol' else ('&term=period' if terminator_type == 'period' else '')
+    term_param = '' if terminator_type == 'symbol' else ('&term=period' if terminator_type == 'period' else '&term=none')
 
     # Generate passphrases
     passphrase_items = []
@@ -357,7 +357,7 @@ function copyPassphrase(button, text) {{
 
 <div class='top-buttons'>
 <a href='?level={complexity}&sep={sep_param}{num_param}{cap_param}{term_param}' class='generate-btn'>Generate New</a>
-<a href='{script_name}' class='reset-btn'>Reset to Defaults</a>
+<a href='?' class='reset-btn'>Reset to Defaults</a>
 </div>
 
 <div class='buttons'>
@@ -382,8 +382,8 @@ function copyPassphrase(button, text) {{
 <div class='option-row'>
 <strong>Add Number:</strong>
 <div class='buttons'>
-<a href='?level={complexity}&sep={sep_param}{cap_param}{term_param}' class='{'active' if not add_number else ''}'>No</a>
-<a href='?level={complexity}&sep={sep_param}&num=yes{cap_param}{term_param}' class='{'active' if add_number else ''}'>Yes</a>
+<a href='?level={complexity}&sep={sep_param}&num=no{cap_param}{term_param}' class='{'active' if not add_number else ''}'>No</a>
+<a href='?level={complexity}&sep={sep_param}{cap_param}{term_param}' class='{'active' if add_number else ''}'>Yes</a>
 </div></div>
 
 <div class='option-row'>
@@ -396,9 +396,9 @@ function copyPassphrase(button, text) {{
 <div class='option-row'>
 <strong>Terminator:</strong>
 <div class='buttons'>
-<a href='?level={complexity}&sep={sep_param}{num_param}{cap_param}' class='{'active' if terminator_type == 'none' else ''}'>None</a>
+<a href='?level={complexity}&sep={sep_param}{num_param}{cap_param}&term=none' class='{'active' if terminator_type == 'none' else ''}'>None</a>
 <a href='?level={complexity}&sep={sep_param}{num_param}{cap_param}&term=period' class='{'active' if terminator_type == 'period' else ''}'>Period</a>
-<a href='?level={complexity}&sep={sep_param}{num_param}{cap_param}&term=symbol' class='{'active' if terminator_type == 'symbol' else ''}'>Random Symbol</a>
+<a href='?level={complexity}&sep={sep_param}{num_param}{cap_param}' class='{'active' if terminator_type == 'symbol' else ''}'>Random Symbol</a>
 </div></div>
 
 </div>
