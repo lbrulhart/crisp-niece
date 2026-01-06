@@ -220,7 +220,10 @@ def application(environ, start_response):
         return [body.encode("utf-8")]
 
     status = '200 OK'
-    headers = [('Content-type', 'text/html; charset=utf-8')]
+    headers = [
+        ('Content-type', 'text/html; charset=utf-8'),
+        ('X-Sector-5150', 'Classification: TOP SECRET // Source: The Crisp Niece // Status: Unstable')
+    ]
     start_response(status, headers)
 
     # Parse query string for complexity level and separator
@@ -289,29 +292,53 @@ def application(environ, start_response):
 
     body = f"""<html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Secure Surreal Passphrases</title>
 <style>
-body {{ font-family: Arial, sans-serif; margin: 40px; }}
-.buttons {{ margin: 20px 0; }}
-.buttons a {{ padding: 6px 14px; margin: 3px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; font-size: 14px; }}
+body {{ font-family: Arial, sans-serif; margin: 40px; max-width: 1200px; margin-left: auto; margin-right: auto; }}
+.buttons {{ margin: 20px 0; display: flex; flex-wrap: wrap; gap: 5px; }}
+.buttons a {{ padding: 6px 14px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; font-size: 14px; white-space: nowrap; }}
 .buttons a:hover {{ background: #0056b3; }}
 .buttons a.active {{ background: #28a745; pointer-events: none; cursor: default; }}
 .options-table {{ margin: 20px 0; }}
-.option-row {{ display: grid; grid-template-columns: 150px 1fr; align-items: center; margin: 6px 0; }}
+.option-row {{ display: grid; grid-template-columns: 150px 1fr; align-items: center; margin: 6px 0; gap: 10px; }}
 .option-row strong {{ text-align: right; padding-right: 15px; }}
-.option-row .buttons {{ margin: 0; display: flex; gap: 5px; }}
+.option-row .buttons {{ margin: 0; display: flex; gap: 5px; flex-wrap: wrap; }}
+.top-buttons {{ margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; }}
 .generate-btn {{ padding: 10px 30px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; font-size: 16px; display: inline-block; }}
 .generate-btn:hover {{ background: #218838; }}
 .reset-btn {{ padding: 10px 30px; background: #6c757d; color: white; text-decoration: none; border-radius: 5px; font-size: 16px; display: inline-block; }}
 .reset-btn:hover {{ background: #5a6268; }}
 ul {{ list-style: none; padding: 0; }}
-li {{ margin: 10px 0; padding: 10px; background: #f8f9fa; border-left: 4px solid #007bff; }}
-.passphrase {{ font-size: 1.1em; user-select: all; cursor: pointer; display: inline-block; }}
+li {{ margin: 10px 0; padding: 10px; background: #f8f9fa; border-left: 4px solid #007bff; word-break: break-word; }}
+.passphrase {{ font-size: 1.1em; user-select: all; cursor: pointer; display: inline-block; word-break: break-word; }}
 .passphrase:hover {{ background: #e9ecef; padding: 2px 4px; margin: -2px -4px; border-radius: 3px; }}
-.entropy {{ color: #666; font-size: 0.9em; margin-left: 10px; }}
+.entropy {{ color: #666; font-size: 0.9em; margin-left: 10px; display: inline-block; }}
 .copy-btn {{ margin-left: 10px; padding: 4px 8px; background: transparent; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; font-size: 1.2em; }}
 .copy-btn:hover {{ background: #f8f9fa; border-color: #007bff; }}
 .copy-btn:active {{ background: #e9ecef; }}
+
+@media (max-width: 768px) {{
+  body {{ margin: 20px 10px; }}
+  h1 {{ font-size: 1.5em; }}
+  .option-row {{ grid-template-columns: 1fr; gap: 5px; }}
+  .option-row strong {{ text-align: left; padding-right: 0; padding-bottom: 5px; }}
+  .buttons:not(.option-row .buttons) {{ flex-direction: column; }}
+  .buttons:not(.option-row .buttons) a {{ width: 100%; text-align: center; }}
+  .buttons a {{ font-size: 13px; padding: 5px 10px; }}
+  .generate-btn, .reset-btn {{ padding: 8px 20px; font-size: 14px; width: 100%; text-align: center; }}
+  .top-buttons {{ flex-direction: column; }}
+  .passphrase {{ font-size: 1em; }}
+  .entropy {{ display: block; margin-left: 0; margin-top: 5px; }}
+  li {{ padding: 8px; }}
+}}
+
+@media (max-width: 480px) {{
+  body {{ margin: 15px 8px; }}
+  h1 {{ font-size: 1.3em; }}
+  .buttons a {{ font-size: 12px; padding: 4px 8px; }}
+  .passphrase {{ font-size: 0.95em; }}
+}}
 </style>
 <script>
 function copyPassphrase(button, text) {{
@@ -328,9 +355,9 @@ function copyPassphrase(button, text) {{
 <body>
 <h1>Secure Surreal Passphrases</h1>
 
-<div style='margin-bottom: 20px;'>
+<div class='top-buttons'>
 <a href='?level={complexity}&sep={sep_param}{num_param}{cap_param}{term_param}' class='generate-btn'>Generate New</a>
-<a href='{script_name}' style='padding: 10px 30px; background: #6c757d; color: white; text-decoration: none; border-radius: 5px; font-size: 16px; display: inline-block;'>Reset to Defaults</a>
+<a href='{script_name}' class='reset-btn'>Reset to Defaults</a>
 </div>
 
 <div class='buttons'>
@@ -404,6 +431,11 @@ Copyright &copy; 2026 | Licensed under <a href='https://opensource.org/licenses/
 
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server
-    print("Serving on http://localhost:5150...")
-    httpd = make_server('localhost', 5150, application)
-    httpd.serve_forever()
+    # Port 5150: Area 51 + Section 5150 (Involuntary Hold)
+    print("Initiating Sector 5150...")
+    print("Access the generator at: http://localhost:5150")
+    try:
+        httpd = make_server('localhost', 5150, application)
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("\nSector 5150 standby. The truth remains out there.")
