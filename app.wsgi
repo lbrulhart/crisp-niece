@@ -401,3 +401,9 @@ Copyright &copy; 2026 | Licensed under <a href='https://opensource.org/licenses/
 </html>"""
 
     return [body.encode("utf-8")]
+
+if __name__ == '__main__':
+    from wsgiref.simple_server import make_server
+    print("Serving on http://localhost:5150...")
+    httpd = make_server('localhost', 5150, application)
+    httpd.serve_forever()
