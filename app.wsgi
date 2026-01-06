@@ -7,6 +7,7 @@ import secrets
 import math
 import time
 import os
+import sys
 from collections import defaultdict
 
 # Get the directory where this script is located
@@ -17,17 +18,29 @@ def load_words(path):
     with open(path) as f:
         return [w.strip() for w in f if w.strip()]
 
-adjectives = load_words(os.path.join(script_dir, "words/adjectives.txt"))
-verbs      = load_words(os.path.join(script_dir, "words/verbs.txt"))
-adverbs    = load_words(os.path.join(script_dir, "words/adverbs.txt"))
-nouns      = load_words(os.path.join(script_dir, "words/medium_nouns.txt"))
+# Load both tiers
+adjectives_orig = load_words(os.path.join(script_dir, "words/adjectives.txt"))
+adjectives_large = load_words(os.path.join(script_dir, "words/adjectives_large.txt"))
+
+verbs_orig      = load_words(os.path.join(script_dir, "words/verbs.txt"))
+verbs_large      = load_words(os.path.join(script_dir, "words/verbs_large.txt"))
+
+adverbs_orig    = load_words(os.path.join(script_dir, "words/adverbs.txt"))
+adverbs_large    = load_words(os.path.join(script_dir, "words/adverbs_large.txt"))
+
+nouns_orig      = load_words(os.path.join(script_dir, "words/medium_nouns.txt"))
+nouns_large      = load_words(os.path.join(script_dir, "words/nouns_large.txt"))
+
 prepositions = load_words(os.path.join(script_dir, "words/prepositions.txt"))
 
+# Probability configuration
+ORIG_CHANCE = 70  # Percent chance to pick from hand-picked list
+
 word_counts = {
-    "adj": len(adjectives),
-    "noun": len(nouns),
-    "verb": len(verbs),
-    "adv": len(adverbs),
+    "adj": (len(adjectives_orig) * (ORIG_CHANCE/100)) + (len(adjectives_large) * ((100-ORIG_CHANCE)/100)),
+    "noun": (len(nouns_orig) * (ORIG_CHANCE/100)) + (len(nouns_large) * ((100-ORIG_CHANCE)/100)),
+    "verb": (len(verbs_orig) * (ORIG_CHANCE/100)) + (len(verbs_large) * ((100-ORIG_CHANCE)/100)),
+    "adv": (len(adverbs_orig) * (ORIG_CHANCE/100)) + (len(adverbs_large) * ((100-ORIG_CHANCE)/100)),
     "prep": len(prepositions),
 }
 
@@ -96,33 +109,49 @@ def entropy_description(bits):
     else:
         return "virtually uncrackable"
 
-def generate_phrase(template, separator=" ", add_number=False, capitalize_first=True, terminator='.'):
-    word_lists = {
-        "adj": adjectives,
-        "noun": nouns,
-        "verb": verbs,
-        "adv": adverbs,
-        "prep": prepositions,
+
+def generate_phrase(template, separator="", add_number=True, capitalize_mode='first', terminator='.'):
+    word_pools = {
+        "adj": (adjectives_orig, adjectives_large),
+        "noun": (nouns_orig, nouns_large),
+        "verb": (verbs_orig, verbs_large),
+        "adv": (adverbs_orig, adverbs_large),
+        "prep": (prepositions, prepositions),  # Preps don't have a large tier yet
     }
 
     phrase_words = []
+    word_sources = []
     for pos in template:
-        phrase_words.append(secrets.choice(word_lists[pos]))
+        orig_list, large_list = word_pools[pos]
+
+        # Weighted selection: 70% chance for hand-picked, 30% for EFF
+        if secrets.randbelow(100) < ORIG_CHANCE:
+            word = secrets.choice(orig_list)
+            phrase_words.append(word)
+            word_sources.append(f"{pos}:orig({word})")
+        else:
+            word = secrets.choice(large_list)
+            phrase_words.append(word)
+            word_sources.append(f"{pos}:large({word})")
 
     # Handle different separator types
     if separator == "":
-        # CamelCase: capitalize each word and remove spaces within multi-word entries
+        # CamelCase: always capitalize each word and remove spaces within multi-word entries
         phrase_words = [''.join([w.capitalize() for w in word.split()]) for word in phrase_words]
         result = ''.join(phrase_words)
     elif separator is None:
         # None: no separator, respect capitalization option
-        if capitalize_first:
+        if capitalize_mode == 'first':
             phrase_words[0] = phrase_words[0].capitalize()
+        elif capitalize_mode == 'all':
+            phrase_words = [word.capitalize() for word in phrase_words]
         result = ''.join(phrase_words)
     else:
-        # Space or dash: join with separator
-        if capitalize_first:
+        # Space or dash: join with separator, respect capitalization option
+        if capitalize_mode == 'first':
             phrase_words[0] = phrase_words[0].capitalize()
+        elif capitalize_mode == 'all':
+            phrase_words = [word.capitalize() for word in phrase_words]
         result = separator.join(phrase_words)
 
     # Add a random number at the end if requested (1-9, no zero to avoid confusion with O)
@@ -135,7 +164,7 @@ def generate_phrase(template, separator=" ", add_number=False, capitalize_first=
             # Dash or CamelCase: just append the number
             result += number
 
-    return result + terminator
+    return result + terminator, word_sources
 
 # This is the WSGI entry point Apache expects
 def application(environ, start_response):
@@ -239,7 +268,7 @@ def application(environ, start_response):
         complexity = 'extralong'
 
     # Parse separator
-    separator = '-'  # default (Dash)
+    separator = ' '  # default (Space)
     if 'sep=space' in query_string:
         separator = ' '
     elif 'sep=dash' in query_string:
@@ -250,29 +279,37 @@ def application(environ, start_response):
         separator = None
 
     # Parse add_number option
-    add_number = 'num=no' not in query_string  # default yes
+    add_number = 'num=yes' in query_string  # default no
 
     # Parse capitalization option
-    capitalize_first = 'cap=no' not in query_string  # default yes
+    capitalize_mode = 'first'  # default: capitalize first word only
+    if 'cap=no' in query_string:
+        capitalize_mode = 'no'
+    elif 'cap=all' in query_string:
+        capitalize_mode = 'all'
+    elif 'cap=first' in query_string:
+        capitalize_mode = 'first'
 
     # Parse terminator option
-    terminator_type = 'symbol'  # default symbol
+    terminator_type = 'none'  # default none
     if 'term=period' in query_string:
         terminator_type = 'period'
-    elif 'term=none' in query_string:
-        terminator_type = 'none'
+    elif 'term=symbol' in query_string:
+        terminator_type = 'symbol'
 
     # Build URL parameters
     sep_param = 'space' if separator == ' ' else ('dash' if separator == '-' else ('camel' if separator == '' else 'none'))
-    num_param = '' if add_number else '&num=no'
-    cap_param = '' if capitalize_first else '&cap=no'
-    term_param = '' if terminator_type == 'symbol' else ('&term=period' if terminator_type == 'period' else '&term=none')
+    num_param = '&num=yes' if add_number else ''
+    cap_param = '' if capitalize_mode == 'first' else ('&cap=no' if capitalize_mode == 'no' else '&cap=all')
+    term_param = '' if terminator_type == 'none' else ('&term=period' if terminator_type == 'period' else '&term=symbol')
 
     # Generate passphrases
     passphrase_items = []
     template_list = templates[complexity]
-    for _ in range(10):
+    print(f"[DEBUG] Complexity: {complexity}, Template pool size: {len(template_list)}, Templates: {template_list}", file=sys.stderr)
+    for i in range(10):
         template = secrets.choice(template_list)
+        print(f"[DEBUG] Passphrase {i+1}: Selected template: {template}", file=sys.stderr)
         # Generate terminator for each phrase
         if terminator_type == 'symbol':
             terminator = secrets.choice(['!', '?', '@', '#', '$', '%', '&', '*'])
@@ -280,7 +317,8 @@ def application(environ, start_response):
             terminator = ''
         else:
             terminator = '.'
-        phrase = generate_phrase(template, separator, add_number, capitalize_first, terminator)
+        phrase, word_sources = generate_phrase(template, separator, add_number, capitalize_mode, terminator)
+        print(f"[DEBUG] Word sources: {', '.join(word_sources)}", file=sys.stderr)
         entropy = calculate_entropy(template)
         description = entropy_description(entropy)
         # Escape single quotes for JavaScript
@@ -380,25 +418,26 @@ function copyPassphrase(button, text) {{
 </div></div>
 
 <div class='option-row'>
-<strong>Add Number:</strong>
+<strong>Capitalize:</strong>
 <div class='buttons'>
-<a href='?level={complexity}&sep={sep_param}&num=no{cap_param}{term_param}' class='{'active' if not add_number else ''}'>No</a>
-<a href='?level={complexity}&sep={sep_param}{cap_param}{term_param}' class='{'active' if add_number else ''}'>Yes</a>
+<a href='?level={complexity}&sep={sep_param}{num_param}{term_param}' class='{'active' if capitalize_mode == 'first' else ''}'>First</a>
+<a href='?level={complexity}&sep={sep_param}{num_param}&cap=all{term_param}' class='{'active' if capitalize_mode == 'all' else ''}'>All</a>
+<a href='?level={complexity}&sep={sep_param}{num_param}&cap=no{term_param}' class='{'active' if capitalize_mode == 'no' else ''}'>None</a>
 </div></div>
 
 <div class='option-row'>
-<strong>Capitalize First:</strong>
+<strong>Add Number:</strong>
 <div class='buttons'>
-<a href='?level={complexity}&sep={sep_param}{num_param}{term_param}' class='{'active' if capitalize_first else ''}'>Yes</a>
-<a href='?level={complexity}&sep={sep_param}{num_param}&cap=no{term_param}' class='{'active' if not capitalize_first else ''}'>No</a>
+<a href='?level={complexity}&sep={sep_param}{cap_param}{term_param}' class='{'active' if not add_number else ''}'>No</a>
+<a href='?level={complexity}&sep={sep_param}&num=yes{cap_param}{term_param}' class='{'active' if add_number else ''}'>Yes</a>
 </div></div>
 
 <div class='option-row'>
 <strong>Terminator:</strong>
 <div class='buttons'>
-<a href='?level={complexity}&sep={sep_param}{num_param}{cap_param}&term=none' class='{'active' if terminator_type == 'none' else ''}'>None</a>
+<a href='?level={complexity}&sep={sep_param}{num_param}{cap_param}' class='{'active' if terminator_type == 'none' else ''}'>None</a>
 <a href='?level={complexity}&sep={sep_param}{num_param}{cap_param}&term=period' class='{'active' if terminator_type == 'period' else ''}'>Period</a>
-<a href='?level={complexity}&sep={sep_param}{num_param}{cap_param}' class='{'active' if terminator_type == 'symbol' else ''}'>Random Symbol</a>
+<a href='?level={complexity}&sep={sep_param}{num_param}{cap_param}&term=symbol' class='{'active' if terminator_type == 'symbol' else ''}'>Random Symbol</a>
 </div></div>
 
 </div>
