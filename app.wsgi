@@ -169,11 +169,30 @@ def application(environ, start_response):
         .back-link:hover {
             background: rgba(0, 86, 179, 0.9);
         }
+        .about-text {
+            color: #fff;
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            padding: 20px;
+            line-height: 1.6;
+            text-align: left;
+            margin-top: 20px;
+        }
+        .about-text p {
+            margin-bottom: 1em;
+        }
     </style>
 </head>
 <body>
     <a href="/passphrase" class="back-link">← Back to Generator</a>
     <img src="/passphrase/avatar.png" alt="About the Creator">
+    <div class="about-text">
+        <p>Built by someone who got tired of searching the internet for a decent passphrase generator and thought, "How hard could it be?"</p>
+        <p>Turns out, pretty fun actually.</p>
+        <p>After an afternoon of tinkering (and way too much debate about whether the period counts as a special character), this tool emerged: a generator that makes passphrases weird enough to remember but strong enough that even your most paranoid sysadmin would approve.</p>
+        <p>Why surreal passphrases? Because "Ancient emperor travels carefully through crystal castles" is objectively more fun to type than P@ssw0rd123! and way more secure.</p>
+        <p>If this saved you from yet another password reset email, consider buying me a coffee. If it didn't, well, at least you got to read about a crisp niece who promises ruin.</p>
+    </div>
 </body>
 </html>"""
         return [about_html.encode("utf-8")]
