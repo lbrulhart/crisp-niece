@@ -1,17 +1,114 @@
+#!/usr/bin/env python3
+"""
+Sort EFF wordlist by part of speech using suffix patterns + WordNet
+Creates _large.txt files by combining existing curated words with categorized EFF words
+"""
+
 import os
-from textblob import TextBlob
+from collections import defaultdict
 
 # Paths
 EFF_LIST = "eff_large_wordlist.txt"
 WORDS_DIR = "words"
 
+# Strong suffix patterns (highly reliable)
+SUFFIX_RULES = {
+    'noun': [
+        'ness', 'ment', 'tion', 'sion', 'ance', 'ence', 'ship', 'hood',
+        'ity', 'ty', 'ism', 'ist', 'ery', 'ary', 'age', 'dom'
+    ],
+    'verb': [
+        'ify', 'ize', 'ise', 'ate'
+    ],
+    'adjective': [
+        'able', 'ible', 'ful', 'less', 'ous', 'ious', 'eous', 'ive',
+        'al', 'ic', 'ical', 'ish', 'like', 'some'
+    ],
+    'adverb': [
+        'ly'
+    ]
+}
+
+def get_pos_by_suffix(word):
+    """Return POS based on suffix, or None if no clear match"""
+    word_lower = word.lower()
+
+    # Check noun suffixes first (most reliable)
+    for suffix in SUFFIX_RULES['noun']:
+        if word_lower.endswith(suffix) and len(word) > len(suffix) + 2:
+            return 'noun'
+
+    # Check adverb -ly (but not words like "holy", "ugly" etc)
+    if word_lower.endswith('ly') and len(word) > 4:
+        # Exclude adjectives that happen to end in -ly
+        base = word_lower[:-2]
+        if not any(base.endswith(s) for s in ['ug', 'hol', 'jol', 'ear', 'oil', 'dai']):
+            return 'adverb'
+
+    # Check adjective suffixes
+    for suffix in SUFFIX_RULES['adjective']:
+        if word_lower.endswith(suffix) and len(word) > len(suffix) + 2:
+            return 'adjective'
+
+    # Check verb suffixes (least reliable, many conflicts)
+    for suffix in SUFFIX_RULES['verb']:
+        if word_lower.endswith(suffix) and len(word) > len(suffix) + 2:
+            return 'verb'
+
+    return None
+
+def categorize_with_wordnet(words):
+    """Use WordNet to categorize words that don't have clear suffixes"""
+    try:
+        from nltk.corpus import wordnet as wn
+    except:
+        print("  WordNet not available, skipping unknown words")
+        return None
+
+    categorized = {
+        'noun': set(),
+        'verb': set(),
+        'adjective': set(),
+        'adverb': set(),
+        'still_unknown': set()
+    }
+
+    pos_map = {
+        'n': 'noun',
+        'v': 'verb',
+        'a': 'adjective',
+        's': 'adjective',  # adjective satellite
+        'r': 'adverb'
+    }
+
+    print(f"  Using WordNet to categorize {len(words)} unknown words...")
+
+    for word in words:
+        synsets = wn.synsets(word)
+        if not synsets:
+            categorized['still_unknown'].add(word)
+            continue
+
+        # Get primary POS (most common usage)
+        pos_counts = {}
+        for syn in synsets:
+            pos = syn.pos()
+            pos_counts[pos] = pos_counts.get(pos, 0) + 1
+
+        # Use the most common POS
+        primary_pos = max(pos_counts.items(), key=lambda x: x[1])[0]
+        category = pos_map.get(primary_pos, 'still_unknown')
+        categorized[category].add(word)
+
+    return categorized
 
 def sieve_eff():
+    """Sort EFF wordlist and create _large.txt files"""
     if not os.path.exists(EFF_LIST):
         print(f"Error: {EFF_LIST} not found.")
         return
 
-    print("Analyzing EFF list... this takes a moment.")
+    print("Analyzing EFF list using suffix patterns + WordNet...\n")
 
     # 1. Load the EFF list words
     eff_words = []
@@ -19,58 +116,83 @@ def sieve_eff():
         for line in f:
             parts = line.strip().split()
             if parts:
-                eff_words.append(parts[-1].lower())
+                word = parts[-1].lower()
+                if word.isalpha():  # Only alphabetic words
+                    eff_words.append(word)
 
-    # 2. Tag them in chunks (TextBlob is faster this way)
-    blob = TextBlob(" ".join(eff_words))
+    print(f"Loaded {len(eff_words)} words from EFF list\n")
 
-    # Storage for found words
-    found = {
-        "JJ": set(),  # Adjectives
-        "RB": set(),  # Adverbs
-        "NN": set(),  # Nouns
-        "VB": set()  # Verbs
+    # 2. Categorize by suffix first
+    categorized = {
+        'adjective': set(),
+        'adverb': set(),
+        'noun': set(),
+        'verb': set(),
     }
+    unknown_words = []
 
-    for word, pos in blob.tags:
-        if not word.isalpha(): continue
-        # Map tags
-        if pos.startswith('JJ'):
-            found["JJ"].add(word)
-        elif pos.startswith('RB'):
-            found["RB"].add(word)
-        elif pos.startswith('NN'):
-            found["NN"].add(word)
-        elif pos.startswith('VB'):
-            found["VB"].add(word)
+    print("Step 1: Categorizing by suffix patterns...")
+    for word in eff_words:
+        pos = get_pos_by_suffix(word)
+        if pos:
+            categorized[pos].add(word)
+        else:
+            unknown_words.append(word)
 
-    # 3. Mapping to your files
+    print(f"  Adjectives: {len(categorized['adjective'])}")
+    print(f"  Adverbs: {len(categorized['adverb'])}")
+    print(f"  Nouns: {len(categorized['noun'])}")
+    print(f"  Verbs: {len(categorized['verb'])}")
+    print(f"  Unknown: {len(unknown_words)}")
+
+    # 3. Try WordNet for unknown words
+    if unknown_words:
+        print(f"\nStep 2: Categorizing unknown words with WordNet...")
+        wordnet_results = categorize_with_wordnet(unknown_words)
+
+        if wordnet_results:
+            for pos in ['adjective', 'adverb', 'noun', 'verb']:
+                categorized[pos].update(wordnet_results[pos])
+                print(f"  Added {len(wordnet_results[pos])} {pos}s from WordNet")
+
+            # Save truly unknown words
+            if wordnet_results['still_unknown']:
+                unknown_file = os.path.join(WORDS_DIR, 'unknown_words.txt')
+                with open(unknown_file, 'w') as f:
+                    f.write('\n'.join(sorted(wordnet_results['still_unknown'])))
+                print(f"\n  {len(wordnet_results['still_unknown'])} words still unknown, saved to {unknown_file}")
+
+    # 4. Mapping to files
     mapping = {
-        "adjectives": ("adjectives.txt", "JJ"),
-        "adverbs": ("adverbs.txt", "RB"),
-        "nouns": ("medium_nouns.txt", "NN"),
-        "verbs": ("verbs.txt", "VB")
+        'adjective': ('adjectives.txt', 'adjectives_large.txt'),
+        'adverb': ('adverbs.txt', 'adverbs_large.txt'),
+        'noun': ('medium_nouns.txt', 'nouns_large.txt'),
+        'verb': ('verbs.txt', 'verbs_large.txt')
     }
 
-    # 4. Merge and overwrite _large files
-    for label, (filename, tag) in mapping.items():
-        path = os.path.join(WORDS_DIR, filename)
+    # 5. Merge and create _large files
+    print("\nStep 3: Creating _large files...")
+    for pos, (base_file, large_file) in mapping.items():
+        base_path = os.path.join(WORDS_DIR, base_file)
+        large_path = os.path.join(WORDS_DIR, large_file)
 
-        # Load your existing hand-picked words
+        # Load existing curated words
         existing = set()
-        if os.path.exists(path):
-            with open(path, 'r') as f:
+        if os.path.exists(base_path):
+            with open(base_path, 'r') as f:
                 existing = {line.strip().lower() for line in f if line.strip()}
 
-        # Combine your curated words with the new discoveries from EFF
-        combined = sorted(list(existing.union(found[tag])))
+        # Combine curated words with EFF words
+        combined = sorted(list(existing.union(categorized[pos])))
 
-        output_name = f"{label}_large.txt"
-        with open(os.path.join(WORDS_DIR, output_name), 'w') as f:
+        # Write _large file
+        with open(large_path, 'w') as f:
             f.write('\n'.join(combined))
 
-        print(f"Updated {label}: {len(existing)} -> {len(combined)} words")
+        new_from_eff = len(categorized[pos] - existing)
+        print(f"  {pos}s: {len(existing)} curated + {new_from_eff} new EFF = {len(combined)} total")
 
+    print("\nDone! Created all _large files.")
 
 if __name__ == "__main__":
     sieve_eff()
