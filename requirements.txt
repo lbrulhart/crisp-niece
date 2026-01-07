@@ -1,0 +1,9 @@
+# No external dependencies required
+# All dependencies are Python standard library:
+# - secrets (cryptographic random generation)
+# - math (entropy calculations)
+# - time (rate limiting)
+# - os (file paths)
+# - collections (defaultdict for rate limiting)
+
+# Python 3.6+ required
