@@ -297,11 +297,28 @@ def application(environ, start_response):
     elif 'term=symbol' in query_string:
         terminator_type = 'symbol'
 
-    # Build URL parameters
-    sep_param = 'space' if separator == ' ' else ('dash' if separator == '-' else ('camel' if separator == '' else 'none'))
-    num_param = '&num=yes' if add_number else ''
-    cap_param = '' if capitalize_mode == 'first' else ('&cap=no' if capitalize_mode == 'no' else '&cap=all')
-    term_param = '' if terminator_type == 'none' else ('&term=period' if terminator_type == 'period' else '&term=symbol')
+    # Helper function to build clean URLs with only non-default params
+    def build_url(**kwargs):
+        params = []
+        level = kwargs.get('level', complexity)
+        sep = kwargs.get('sep', separator)
+        num = kwargs.get('num', add_number)
+        cap = kwargs.get('cap', capitalize_mode)
+        term = kwargs.get('term', terminator_type)
+
+        if level != 'long':
+            params.append(f'level={level}')
+        if sep != ' ':
+            sep_val = 'space' if sep == ' ' else ('dash' if sep == '-' else ('camel' if sep == '' else 'none'))
+            params.append(f'sep={sep_val}')
+        if num:
+            params.append('num=yes')
+        if cap != 'first':
+            params.append(f'cap={cap}')
+        if term != 'none':
+            params.append(f'term={term}')
+
+        return '?' + '&'.join(params) if params else '?'
 
     # Generate passphrases
     passphrase_items = []
@@ -394,16 +411,16 @@ function copyPassphrase(button, text) {{
 <h1>Secure Surreal Passphrases</h1>
 
 <div class='top-buttons'>
-<a href='?level={complexity}&sep={sep_param}{num_param}{cap_param}{term_param}' class='generate-btn'>Generate New</a>
+<a href='{build_url()}' class='generate-btn'>Generate New</a>
 <a href='?' class='reset-btn'>Reset to Defaults</a>
 </div>
 
 <div class='buttons'>
-<a href='?level=very_short&sep={sep_param}{num_param}{cap_param}{term_param}' class='{'active' if complexity == 'very_short' else ''}'>Very Short (3 words)</a>
-<a href='?level=short&sep={sep_param}{num_param}{cap_param}{term_param}' class='{'active' if complexity == 'short' else ''}'>Short (4 words)</a>
-<a href='?level=medium&sep={sep_param}{num_param}{cap_param}{term_param}' class='{'active' if complexity == 'medium' else ''}'>Medium (4-5 words)</a>
-<a href='?level=long&sep={sep_param}{num_param}{cap_param}{term_param}' class='{'active' if complexity == 'long' else ''}'>Long (4-6 words)</a>
-<a href='?level=extralong&sep={sep_param}{num_param}{cap_param}{term_param}' class='{'active' if complexity == 'extralong' else ''}'>Extra Long (7-10 words)</a>
+<a href='{build_url(level="very_short")}' class='{'active' if complexity == 'very_short' else ''}'>Very Short (3 words)</a>
+<a href='{build_url(level="short")}' class='{'active' if complexity == 'short' else ''}'>Short (4 words)</a>
+<a href='{build_url(level="medium")}' class='{'active' if complexity == 'medium' else ''}'>Medium (4-5 words)</a>
+<a href='{build_url(level="long")}' class='{'active' if complexity == 'long' else ''}'>Long (4-6 words)</a>
+<a href='{build_url(level="extralong")}' class='{'active' if complexity == 'extralong' else ''}'>Extra Long (7-10 words)</a>
 </div>
 
 <div class='options-table'>
@@ -411,33 +428,33 @@ function copyPassphrase(button, text) {{
 <div class='option-row'>
 <strong>Separator:</strong>
 <div class='buttons'>
-<a href='?level={complexity}&sep=space{num_param}{cap_param}{term_param}' class='{'active' if separator == ' ' else ''}'>Space</a>
-<a href='?level={complexity}&sep=dash{num_param}{cap_param}{term_param}' class='{'active' if separator == '-' else ''}'>Dash</a>
-<a href='?level={complexity}&sep=camel{num_param}{cap_param}{term_param}' class='{'active' if separator == '' else ''}'>CamelCase</a>
-<a href='?level={complexity}&sep=none{num_param}{cap_param}{term_param}' class='{'active' if separator is None else ''}'>None</a>
+<a href='{build_url(sep=" ")}' class='{'active' if separator == ' ' else ''}'>Space</a>
+<a href='{build_url(sep="-")}' class='{'active' if separator == '-' else ''}'>Dash</a>
+<a href='{build_url(sep="")}' class='{'active' if separator == '' else ''}'>CamelCase</a>
+<a href='{build_url(sep=None)}' class='{'active' if separator is None else ''}'>None</a>
 </div></div>
 
 <div class='option-row'>
 <strong>Capitalize:</strong>
 <div class='buttons'>
-<a href='?level={complexity}&sep={sep_param}{num_param}{term_param}' class='{'active' if capitalize_mode == 'first' else ''}'>First</a>
-<a href='?level={complexity}&sep={sep_param}{num_param}&cap=all{term_param}' class='{'active' if capitalize_mode == 'all' else ''}'>All</a>
-<a href='?level={complexity}&sep={sep_param}{num_param}&cap=no{term_param}' class='{'active' if capitalize_mode == 'no' else ''}'>None</a>
+<a href='{build_url(cap="first")}' class='{'active' if capitalize_mode == 'first' else ''}'>First</a>
+<a href='{build_url(cap="all")}' class='{'active' if capitalize_mode == 'all' else ''}'>All</a>
+<a href='{build_url(cap="no")}' class='{'active' if capitalize_mode == 'no' else ''}'>None</a>
 </div></div>
 
 <div class='option-row'>
 <strong>Add Number:</strong>
 <div class='buttons'>
-<a href='?level={complexity}&sep={sep_param}{cap_param}{term_param}' class='{'active' if not add_number else ''}'>No</a>
-<a href='?level={complexity}&sep={sep_param}&num=yes{cap_param}{term_param}' class='{'active' if add_number else ''}'>Yes</a>
+<a href='{build_url(num=False)}' class='{'active' if not add_number else ''}'>No</a>
+<a href='{build_url(num=True)}' class='{'active' if add_number else ''}'>Yes</a>
 </div></div>
 
 <div class='option-row'>
 <strong>Terminator:</strong>
 <div class='buttons'>
-<a href='?level={complexity}&sep={sep_param}{num_param}{cap_param}' class='{'active' if terminator_type == 'none' else ''}'>None</a>
-<a href='?level={complexity}&sep={sep_param}{num_param}{cap_param}&term=period' class='{'active' if terminator_type == 'period' else ''}'>Period</a>
-<a href='?level={complexity}&sep={sep_param}{num_param}{cap_param}&term=symbol' class='{'active' if terminator_type == 'symbol' else ''}'>Random Symbol</a>
+<a href='{build_url(term="none")}' class='{'active' if terminator_type == 'none' else ''}'>None</a>
+<a href='{build_url(term="period")}' class='{'active' if terminator_type == 'period' else ''}'>Period</a>
+<a href='{build_url(term="symbol")}' class='{'active' if terminator_type == 'symbol' else ''}'>Random Symbol</a>
 </div></div>
 
 </div>
