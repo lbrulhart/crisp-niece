@@ -2,6 +2,11 @@
 # Copyright (c) 2026 Lyle Brulhart
 # Licensed under the MIT License
 # https://opensource.org/licenses/MIT
+#
+# Word lists are curated from the EFF's Passphrase Wordlists
+# Copyright (c) 2026 Electronic Frontier Foundation
+# Licensed under GNU GPL v3 or later
+# https://www.eff.org/document/passphrase-wordlists
 
 import secrets
 import math
@@ -34,7 +39,7 @@ nouns_large      = load_words(os.path.join(script_dir, "words/nouns_large.txt"))
 prepositions = load_words(os.path.join(script_dir, "words/prepositions.txt"))
 
 # Probability configuration
-ORIG_CHANCE = 70  # Percent chance to pick from hand-picked list
+ORIG_CHANCE = 70  # Percent chance to pick from a hand-picked list
 
 word_counts = {
     "adj": (len(adjectives_orig) * (ORIG_CHANCE/100)) + (len(adjectives_large) * ((100-ORIG_CHANCE)/100)),
@@ -147,7 +152,7 @@ def generate_phrase(template, separator="", add_number=True, capitalize_mode='fi
             phrase_words = [word.capitalize() for word in phrase_words]
         result = ''.join(phrase_words)
     else:
-        # Space or dash: join with separator, respect capitalization option
+        # Space or dash: join with separator, respect the capitalization option
         if capitalize_mode == 'first':
             phrase_words[0] = phrase_words[0].capitalize()
         elif capitalize_mode == 'all':
@@ -282,7 +287,7 @@ def application(environ, start_response):
     add_number = 'num=yes' in query_string  # default no
 
     # Parse capitalization option
-    capitalize_mode = 'first'  # default: capitalize first word only
+    capitalize_mode = 'first'  # default: capitalize the first word only
     if 'cap=no' in query_string:
         capitalize_mode = 'no'
     elif 'cap=all' in query_string:
@@ -327,7 +332,7 @@ def application(environ, start_response):
     for i in range(10):
         template = secrets.choice(template_list)
         print(f"[DEBUG] Passphrase {i+1}: Selected template: {template}", file=sys.stderr)
-        # Generate terminator for each phrase
+        # Generate a terminator for each phrase
         if terminator_type == 'symbol':
             terminator = secrets.choice(['!', '?', '@', '#', '$', '%', '&', '*'])
         elif terminator_type == 'none':
@@ -343,7 +348,6 @@ def application(environ, start_response):
         passphrase_items.append(f"<li><span class='passphrase'>{phrase}</span><button class='copy-btn' onclick='copyPassphrase(this, \"{escaped_phrase}\")' title='Copy to clipboard'><svg width='16' height='16' viewBox='0 0 16 16' fill='currentColor'><path d='M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2Z'/><path d='M2 6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1H6a3 3 0 0 1-3-3V6H2Z'/></svg></button><span class='entropy'>(~{entropy:.0f} bits - {description})</span></li>")
 
     passphrases_html = '\n'.join(passphrase_items)
-    script_name = environ.get('SCRIPT_NAME', '/passphrase')
 
     body = f"""<html>
 <head>
@@ -426,20 +430,20 @@ function copyPassphrase(button, text) {{
 <div class='options-table'>
 
 <div class='option-row'>
+<strong>Capitalize:</strong>
+<div class='buttons'>
+<a href='{build_url(cap="first")}' class='{'active' if capitalize_mode == 'first' else ''}'>First</a>
+<a href='{build_url(cap="all")}' class='{'active' if capitalize_mode == 'all' else ''}'>All</a>
+<a href='{build_url(cap="no")}' class='{'active' if capitalize_mode == 'no' else ''}'>None</a>
+</div></div>
+
+<div class='option-row'>
 <strong>Separator:</strong>
 <div class='buttons'>
 <a href='{build_url(sep=" ")}' class='{'active' if separator == ' ' else ''}'>Space</a>
 <a href='{build_url(sep="-")}' class='{'active' if separator == '-' else ''}'>Dash</a>
 <a href='{build_url(sep="")}' class='{'active' if separator == '' else ''}'>CamelCase</a>
 <a href='{build_url(sep=None)}' class='{'active' if separator is None else ''}'>None</a>
-</div></div>
-
-<div class='option-row'>
-<strong>Capitalize:</strong>
-<div class='buttons'>
-<a href='{build_url(cap="first")}' class='{'active' if capitalize_mode == 'first' else ''}'>First</a>
-<a href='{build_url(cap="all")}' class='{'active' if capitalize_mode == 'all' else ''}'>All</a>
-<a href='{build_url(cap="no")}' class='{'active' if capitalize_mode == 'no' else ''}'>None</a>
 </div></div>
 
 <div class='option-row'>
@@ -463,7 +467,24 @@ function copyPassphrase(button, text) {{
 {passphrases_html}
 </ul>
 
-<div style='margin-top: 40px; padding: 20px; background: #fff3cd; border-left: 4px solid #ffc107; font-size: 0.9em;'>
+<div style='margin-top: 40px; padding: 20px; background: #f8f9fa; border-left: 4px solid #007bff;'>
+<h2 style='margin-top: 0; font-size: 1.2em;'>Why Passphrases?</h2>
+<p style='margin: 10px 0;'>
+Strong passwords are hard to remember, and memorable passwords are usually weak. Passphrases solve this problem by combining
+multiple random words into phrases that are both secure and memorable. This generator creates grammatically structured passphrases
+using a large vocabulary, resulting in high entropy (randomness) that makes them extremely difficult to crack.
+</p>
+<p style='margin: 10px 0;'>
+Each passphrase's strength is measured in bits of entropy—a 50-bit passphrase would take billions of years to crack with
+current technology. The surreal combinations (like "Crisp niece promises ruin") are intentionally unusual, making them
+both memorable and secure. You can customize separators, capitalization, and add numbers or symbols to meet any password requirements.
+</p>
+<p style='margin: 10px 0; font-size: 0.9em; color: #666;'>
+Built using words curated from the <a href='https://www.eff.org/document/passphrase-wordlists' target='_blank' style='color: #007bff;'>EFF's passphrase wordlists</a>, organized by part of speech for grammatical structure. Thank you to the EFF for their excellent work on password security.
+</p>
+</div>
+
+<div style='margin-top: 20px; padding: 20px; background: #fff3cd; border-left: 4px solid #ffc107; font-size: 0.9em;'>
 <strong>Privacy Notice:</strong> All passphrases are generated server-side using cryptographically secure randomness.
 Generated passphrases are <strong>not logged, stored, or transmitted</strong> to any third party.
 Each generation is completely random and independent.
