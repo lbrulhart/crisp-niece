@@ -8,7 +8,6 @@ accepts
 acclaim
 acclimate
 accompany
-accurate
 accustom
 aching
 acquaint
@@ -20,12 +19,10 @@ adds
 advises
 affected
 affecting
-affiliate
 affirm
 affix
 afflicted
 afford
-aggregate
 aging
 agonize
 agonizing
@@ -61,6 +58,7 @@ appeasing
 applaud
 applied
 applies
+apply
 apprehend
 approve
 arbitrate
@@ -77,6 +75,7 @@ ascertain
 asks
 aspirate
 aspire
+astonish
 astound
 attach
 attain
@@ -97,6 +96,7 @@ babbling
 babied
 backed
 backing
+backpedal
 backslid
 backtrack
 baffle
@@ -108,6 +108,7 @@ bakes
 baking
 balances
 balancing
+banish
 banked
 banking
 barge
@@ -131,6 +132,7 @@ blaspheme
 blast
 blazing
 bleeds
+blemish
 bless
 blighted
 blinked
@@ -196,7 +198,6 @@ builds
 bulge
 bulldog
 bundle
-bunkmate
 burns
 bursts
 bust
@@ -232,7 +233,6 @@ catering
 causing
 cauterize
 celebrates
-celibate
 certified
 certify
 chafe
@@ -280,7 +280,6 @@ clasp
 cleans
 clear
 cleft
-climate
 climbs
 cling
 clings
@@ -318,14 +317,15 @@ competes
 compile
 complains
 completes
+comply
 composed
 compound
 compress
 comprised
+conceal
 conceded
 concerned
 concert
-concise
 conclude
 concrete
 concur
@@ -368,7 +368,7 @@ copied
 copies
 coping
 corned
-corporate
+corral
 correct
 corrects
 corrode
@@ -399,7 +399,6 @@ create
 creates
 crept
 cresting
-crewmate
 cried
 cries
 cringe
@@ -498,7 +497,6 @@ delay
 delays
 delegate
 delete
-delicate
 delighted
 delights
 delivers
@@ -557,6 +555,7 @@ diffused
 dig
 digs
 dilute
+diminish
 dimmed
 dining
 dipped
@@ -578,6 +577,7 @@ discolor
 discover
 discovers
 discusses
+disengage
 disfigure
 disgrace
 disinfect
@@ -589,7 +589,6 @@ dismantle
 dismiss
 disobey
 disown
-disparate
 dispatch
 dispense
 dispersed
@@ -680,6 +679,7 @@ embargo
 embark
 embarrasses
 embattled
+embellish
 embezzle
 embody
 emboss
@@ -690,6 +690,7 @@ emphasize
 employed
 empower
 empties
+empty
 enable
 enables
 enchanted
@@ -697,6 +698,7 @@ encircle
 enclose
 encode
 encounter
+encourage
 encourages
 encroach
 encrust
@@ -723,6 +725,7 @@ enlarged
 enlarging
 enlighten
 enlisted
+enrage
 enrich
 enroll
 enslave
@@ -740,16 +743,16 @@ entrench
 entrust
 entwine
 enunciate
+equal
 equate
 eradicate
 erased
 erupt
 escalate
 escapes
+establish
 establishes
-estate
 esteemed
-estimate
 estranged
 etching
 evacuate
@@ -808,7 +811,6 @@ extenuate
 extradite
 extrude
 extruding
-faceplate
 faces
 facing
 fade
@@ -849,7 +851,6 @@ filling
 fills
 films
 filter
-filtrate
 finalize
 finds
 finished
@@ -1087,10 +1088,10 @@ impending
 implant
 implicate
 implode
+imply
 impose
 imposing
 impound
-imprecise
 imprison
 improve
 improves
@@ -1136,7 +1137,6 @@ juggling
 jump
 jumps
 justify
-karate
 keep
 keeps
 kept
@@ -1187,7 +1187,6 @@ lies
 lifting
 lifts
 likes
-likewise
 liking
 limits
 limping
@@ -1219,7 +1218,6 @@ making
 malt
 manages
 managing
-mandate
 mangle
 manhandle
 manicure
@@ -1313,7 +1311,6 @@ obliged
 observes
 observing
 obsessed
-obstinate
 obstruct
 obtain
 obtains
@@ -1440,6 +1437,7 @@ penalize
 percolate
 perfected
 performs
+perish
 permits
 perplexed
 persecute
@@ -1448,7 +1446,6 @@ persuaded
 persuades
 pester
 petted
-phosphate
 picks
 pinches
 pities
@@ -1461,7 +1458,6 @@ plant
 plaster
 plated
 playing
-playmate
 plays
 pleading
 pleases
@@ -1503,7 +1499,6 @@ praying
 prays
 preaches
 precedes
-precise
 precook
 predict
 predicts
@@ -1529,10 +1524,8 @@ prevent
 prevents
 pricks
 pried
-primate
 primp
 prints
-private
 privatize
 probing
 proceeds
@@ -1621,6 +1614,7 @@ ranked
 ranking
 ransack
 rasping
+ravage
 raven
 raving
 ravishing
@@ -1670,6 +1664,7 @@ reenact
 reexamine
 refined
 refining
+refinish
 reflected
 reflects
 refocus
@@ -1679,6 +1674,8 @@ refract
 refrain
 refresh
 refueling
+refurbish
+refurnish
 refuse
 refuses
 refusing
@@ -1690,7 +1687,6 @@ regrets
 regroup
 regulate
 reheat
-rehydrate
 reigns
 reimburse
 reissue
@@ -1760,6 +1756,7 @@ requests
 require
 rerun
 rescues
+reseal
 resemble
 resent
 reserves
@@ -1800,6 +1797,7 @@ return
 returns
 reunite
 reuse
+reveal
 reveals
 revered
 reversing
@@ -1831,6 +1829,7 @@ rippling
 rise
 rises
 rising
+rival
 riveting
 roaming
 robbing
@@ -1907,14 +1906,12 @@ scuff
 seals
 searches
 secluding
-sedate
 seduce
 seducing
 seizing
 selected
 selects
 sells
-senate
 send
 sends
 sensitize
@@ -2122,7 +2119,6 @@ staging
 stagnate
 stained
 staining
-stalemate
 stalling
 stamps
 stands
@@ -2229,10 +2225,9 @@ suggest
 suggests
 suing
 suits
-sulfate
-sulphate
 supervise
 supplies
+supply
 supports
 supposes
 surcharge
@@ -2242,7 +2237,6 @@ surpass
 surprise
 surprises
 surrenders
-surrogate
 surround
 surrounds
 survey
@@ -2377,7 +2371,6 @@ twisting
 twitch
 tying
 types
-ultimate
 unbend
 unbent
 unblock
@@ -2473,13 +2466,15 @@ uplifting
 upload
 uprising
 uproot
-upstate
+upstage
 used
 uses
 utilize
 utter
 vacate
 values
+vanish
+vanquish
 varied
 varying
 verbalize

@@ -11,21 +11,23 @@ from collections import defaultdict
 EFF_LIST = "eff_large_wordlist.txt"
 WORDS_DIR = "words"
 
-# Strong suffix patterns (highly reliable)
+# Suffix patterns - conservative to minimize false positives
 SUFFIX_RULES = {
     'noun': [
         'ness', 'ment', 'tion', 'sion', 'ance', 'ence', 'ship', 'hood',
-        'ity', 'ty', 'ism', 'ist', 'ery', 'ary', 'age', 'dom'
+        'ity', 'ism', 'ist', 'ery', 'dom'
+        # Removed: 'ty', 'ary', 'age', 'al' - too many false positives
     ],
     'verb': [
-        'ify', 'ize', 'ise', 'ate'
+        'ify', 'ize', 'ise'
+        # Removed: 'ate' - causes too many adjective false positives
     ],
     'adjective': [
-        'able', 'ible', 'ful', 'less', 'ous', 'ious', 'eous', 'ive',
-        'al', 'ic', 'ical', 'ish', 'like', 'some'
+        'able', 'ible', 'less', 'ous', 'ious', 'eous', 'ive'
+        # Removed: 'ful', 'al', 'ic', 'ical', 'ish', 'like', 'some' - too ambiguous
     ],
     'adverb': [
-        'ly'
+        # Will handle -ly specially with exclusions
     ]
 }
 
@@ -33,16 +35,36 @@ def get_pos_by_suffix(word):
     """Return POS based on suffix, or None if no clear match"""
     word_lower = word.lower()
 
+    # Exclude words that are likely nouns ending in common suffixes
+    noun_exceptions = ['fish', 'meal', 'fly', 'berry']
+    if any(word_lower.endswith(exc) for exc in noun_exceptions):
+        return None  # Let WordNet handle these
+
     # Check noun suffixes first (most reliable)
     for suffix in SUFFIX_RULES['noun']:
         if word_lower.endswith(suffix) and len(word) > len(suffix) + 2:
             return 'noun'
 
-    # Check adverb -ly (but not words like "holy", "ugly" etc)
+    # Check adverb -ly with strict exclusions
     if word_lower.endswith('ly') and len(word) > 4:
-        # Exclude adjectives that happen to end in -ly
-        base = word_lower[:-2]
-        if not any(base.endswith(s) for s in ['ug', 'hol', 'jol', 'ear', 'oil', 'dai']):
+        # Exclude common adjectives and nouns ending in -ly
+        not_adverb = ['holy', 'ugly', 'early', 'only', 'holy', 'oily', 'daily',
+                      'jolly', 'burly', 'curly', 'supply', 'apply', 'reply', 'comply',
+                      'imply', 'family', 'jelly', 'belly', 'bully', 'dolly', 'folly',
+                      'gully', 'rally', 'tally', 'valley', 'alley', 'galley', 'trolley',
+                      'volley', 'pulley', 'medley', 'barley', 'parsley', 'monopoly',
+                      'anomaly', 'italy', 'Sicily', 'lily', 'illy', 'hilly', 'billy',
+                      'filly', 'frilly', 'chilly', 'silly', 'willy', 'dragonfly',
+                      'butterfly', 'firefly', 'gadfly', 'horsefly', 'mayfly', 'cuddly',
+                      'bubbly', 'wobbly', 'crinkly', 'crumbly', 'giggly', 'wriggly',
+                      'elderly', 'miserly', 'orderly', 'scholarly', 'cowardly', 'motherly',
+                      'fatherly', 'brotherly', 'sisterly', 'neighborly', 'worldly', 'earthly',
+                      'costly', 'ghastly', 'beastly', 'priestly', 'princely', 'comely',
+                      'homely', 'lonely', 'lovely', 'lively', 'likely', 'timely', 'shapely',
+                      'leisurely', 'disorderly', 'quarterly', 'bodily', 'drizzly', 'grizzly',
+                      'grisly', 'gangly', 'prickly', 'tickly', 'sickly', 'weekly', 'monthly',
+                      'yearly', 'doily', 'gnarly', 'dastardly']
+        if word_lower not in not_adverb:
             return 'adverb'
 
     # Check adjective suffixes
@@ -193,6 +215,65 @@ def sieve_eff():
         print(f"  {pos}s: {len(existing)} curated + {new_from_eff} new EFF = {len(combined)} total")
 
     print("\nDone! Created all _large files.")
+
+    # 6. Cleanup: Remove incorrectly categorized words
+    print("\nStep 4: Cleaning up incorrect categorizations...")
+    cleanup_incorrect_words(mapping)
+
+    print("\n✓ All done! Files created and verified.")
+
+def cleanup_incorrect_words(mapping):
+    """Remove words that don't match their expected POS according to WordNet"""
+    try:
+        from nltk.corpus import wordnet as wn
+    except:
+        print("  WordNet not available, skipping cleanup")
+        return
+
+    pos_map = {
+        'adjective': {'a', 's'},
+        'adverb': {'r'},
+        'noun': {'n'},
+        'verb': {'v'}
+    }
+
+    total_removed = 0
+
+    for pos, (base_file, large_file) in mapping.items():
+        large_path = os.path.join(WORDS_DIR, large_file)
+        expected_pos = pos_map[pos]
+
+        with open(large_path, 'r') as f:
+            words = [line.strip() for line in f if line.strip()]
+
+        # Keep words that match expected POS or aren't in WordNet
+        correct = []
+        removed_count = 0
+
+        for word in words:
+            synsets = wn.synsets(word)
+            if not synsets:
+                # Not in WordNet, keep it
+                correct.append(word)
+            else:
+                # Check if it matches expected POS
+                pos_tags = {syn.pos() for syn in synsets}
+                if expected_pos.intersection(pos_tags):
+                    correct.append(word)
+                else:
+                    removed_count += 1
+
+        # Write back only correct words
+        if removed_count > 0:
+            with open(large_path, 'w') as f:
+                f.write('\n'.join(correct))
+            print(f"  {pos}s: removed {removed_count} incorrect word(s)")
+            total_removed += removed_count
+        else:
+            print(f"  {pos}s: all words verified correct")
+
+    if total_removed > 0:
+        print(f"\n  Total removed: {total_removed} incorrect word(s)")
 
 if __name__ == "__main__":
     sieve_eff()

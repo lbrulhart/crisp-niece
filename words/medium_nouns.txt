@@ -895,7 +895,6 @@ goddess
 gorge
 gorilla
 gossip
-govern
 gown
 grace
 grain
@@ -1389,7 +1388,6 @@ sultan
 summit
 sunrise
 sunset
-supreme
 swallow
 swamp
 swan

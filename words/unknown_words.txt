@@ -41,6 +41,7 @@ cardstock
 carpool
 carwash
 catfight
+catlike
 charbroil
 chemo
 cherisher
@@ -53,8 +54,11 @@ congrats
 cornball
 cornflake
 could
+crablike
 craftwork
+creamlike
 creme
+crewmate
 cruncher
 crunchy
 datebook
@@ -68,8 +72,10 @@ deviancy
 deviator
 disperser
 ditzy
+domelike
 donator
 doozy
+dragonish
 dragster
 drainer
 dreamboat
@@ -78,6 +84,7 @@ dropbox
 ducktail
 duh
 during
+easeful
 eastcoast
 ebay
 ebook
@@ -95,13 +102,17 @@ facecloth
 facedown
 factsheet
 ferris
+finlike
 flagman
 flagstick
+folic
 footsie
 freebase
 freefall
 from
+frostlike
 germproof
+giggly
 glitzy
 gloater
 glorifier
@@ -172,11 +183,14 @@ paver
 pavestone
 payphone
 penholder
+penpal
 petri
 playgroup
 playset
 pogo
+pointy
 portside
+postnasal
 pranker
 precut
 predefine
@@ -211,6 +225,7 @@ refreeze
 refried
 rehab
 rehire
+rehydrate
 relight
 relock
 remix
@@ -218,6 +233,7 @@ remodeler
 renderer
 reoccupy
 reoccur
+repackage
 repacking
 repave
 repost
@@ -235,6 +251,7 @@ reviver
 rewash
 rewind
 rewrap
+ribcage
 riverboat
 rockband
 rockstar
@@ -247,6 +264,7 @@ scabbed
 scorebook
 shoptalk
 shortwave
+shorty
 showbiz
 showoff
 sixtyfold
@@ -275,6 +293,7 @@ superbowl
 superglue
 superhero
 superjet
+tableful
 that
 theatrics
 thee
@@ -327,6 +346,7 @@ unlinked
 unloader
 unmanaged
 unmolded
+unmoral
 unpadded
 unpeeled
 unpiloted
@@ -354,6 +374,8 @@ unthread
 until
 untimed
 unvisited
+unvocal
+unwarlike
 unwatched
 unworn
 upon

@@ -116,7 +116,6 @@ dangerous
 dizzy
 elegant
 friendly
-fun
 glorious
 graceful
 happy
@@ -382,7 +381,6 @@ familiar
 fancy
 fatal
 federal
-fellow
 female
 fertile
 fine

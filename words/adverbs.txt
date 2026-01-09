@@ -256,7 +256,6 @@ openly
 ordinarily
 originally
 outwardly
-overall
 partly
 peacefully
 perfectly
@@ -326,7 +325,6 @@ uncomfortably
 undoubtedly
 uniformly
 uniquely
-unlikely
 unnecessarily
 utterly
 vaguely
