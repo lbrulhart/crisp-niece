@@ -217,7 +217,7 @@ class PassphraseApp:
 </head>
 <body>
     <a href="/passphrase" class="back-link">← Back to Generator</a>
-    <img src="/passphrase/avatar.png" alt="About the Creator">
+    <img src="/passphrase/creator.png" alt="About the Creator">
     <div class="about-text">
         <p>Built by someone who got tired of searching the internet for a decent passphrase generator and thought, "How hard could it be?"</p>
         <p>Turns out, pretty fun actually.</p>
