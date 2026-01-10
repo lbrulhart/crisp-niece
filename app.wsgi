@@ -535,7 +535,6 @@ def application(environ, start_response):
 
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server
-    print("Initiating Sector 5150...")
     print("Access the generator at: http://localhost:5150")
     try:
         httpd = make_server('localhost', 5150, application)
