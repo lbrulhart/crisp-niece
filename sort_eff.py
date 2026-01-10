@@ -2,6 +2,7 @@
 """
 Sort EFF wordlist by part of speech using suffix patterns + WordNet
 Creates _large.txt files by combining existing curated words with categorized EFF words
+Conjugates verbs to 3rd person singular for grammatical correctness
 """
 
 import os
@@ -10,6 +11,49 @@ from collections import defaultdict
 # Paths
 EFF_LIST = "eff_large_wordlist.txt"
 WORDS_DIR = "words"
+
+def conjugate_to_3rd_person(verb):
+    """Convert base verb to 3rd person singular (he/she/it form)"""
+    verb = verb.strip().lower()
+
+    # Skip participles and gerunds - these aren't base verbs
+    if verb.endswith(('ing', 'ed')):
+        return None
+
+    # Already conjugated (ends in 's', but not -ss)
+    if verb.endswith('s') and not verb.endswith('ss'):
+        return verb
+
+    # Words ending in -shes, -ches already conjugated
+    if verb.endswith(('shes', 'ches', 'xes', 'zes', 'ses')):
+        return verb
+
+    # Special cases
+    special_cases = {
+        'be': 'is',
+        'have': 'has',
+        'do': 'does',
+        'go': 'goes',
+        'say': 'says',
+    }
+
+    if verb in special_cases:
+        return special_cases[verb]
+
+    # Verbs ending in consonant + y -> ies
+    if len(verb) > 2 and verb[-1] == 'y' and verb[-2] not in 'aeiou':
+        return verb[:-1] + 'ies'
+
+    # Verbs ending in s, x, z, ch, sh -> +es
+    if verb.endswith(('s', 'x', 'z', 'ch', 'sh', 'ss')):
+        return verb + 'es'
+
+    # Verbs ending in o preceded by consonant -> +es
+    if len(verb) > 2 and verb[-1] == 'o' and verb[-2] not in 'aeiou':
+        return verb + 'es'
+
+    # Default: just add 's'
+    return verb + 's'
 
 # Suffix patterns - conservative to minimize false positives
 SUFFIX_RULES = {
@@ -205,14 +249,28 @@ def sieve_eff():
                 existing = {line.strip().lower() for line in f if line.strip()}
 
         # Combine curated words with EFF words
-        combined = sorted(list(existing.union(categorized[pos])))
+        all_words = existing.union(categorized[pos])
+
+        # Special handling for verbs: conjugate to 3rd person singular
+        if pos == 'verb':
+            conjugated = set()
+            skipped = 0
+            for word in all_words:
+                conjugated_form = conjugate_to_3rd_person(word)
+                if conjugated_form:
+                    conjugated.add(conjugated_form)
+                else:
+                    skipped += 1
+            combined = sorted(list(conjugated))
+            print(f"  {pos}s: {len(existing)} curated + {len(categorized[pos]) - len(existing)} new EFF = {len(combined)} total (skipped {skipped} participles/gerunds)")
+        else:
+            combined = sorted(list(all_words))
+            new_from_eff = len(categorized[pos] - existing)
+            print(f"  {pos}s: {len(existing)} curated + {new_from_eff} new EFF = {len(combined)} total")
 
         # Write _large file
         with open(large_path, 'w') as f:
             f.write('\n'.join(combined))
-
-        new_from_eff = len(categorized[pos] - existing)
-        print(f"  {pos}s: {len(existing)} curated + {new_from_eff} new EFF = {len(combined)} total")
 
     print("\nDone! Created all _large files.")
 
