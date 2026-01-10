@@ -371,7 +371,7 @@ def application(environ, start_response):
     body = f"""<html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Secure Surreal Passphrases</title>
+<title>Secure Surreal Passphrases - by the crisp niece</title>
 <style>
 body {{ font-family: Arial, sans-serif; margin: 40px; max-width: 1200px; margin-left: auto; margin-right: auto; }}
 .buttons {{ margin: 20px 0; display: flex; flex-wrap: wrap; gap: 5px; }}
@@ -431,7 +431,7 @@ function copyPassphrase(button, text) {{
 </script>
 </head>
 <body>
-<h1>Secure Surreal Passphrases</h1>
+<h1>Secure Surreal Passphrases <span style='font-size: 0.6em; color: #666; font-weight: normal;'>by the crisp niece</span></h1>
 
 <div class='top-buttons'>
 <a href='{build_url()}' class='generate-btn'>Generate New</a>
