@@ -84,12 +84,13 @@ sudo systemctl restart httpd
 
 Word lists use a weighted 70/30 mix:
 - **70%**: Hand-picked words chosen for clarity, memorability, and surreal combinations
-- **30%**: [EFF's Long Passphrase Wordlist](https://www.eff.org/document/passphrase-wordlists) for additional entropy
+- **30%**: Words derived from the [EFF's Long Passphrase Wordlist](https://www.eff.org/document/passphrase-wordlists) (modified and organized by part of speech for grammatical structure generation)
 
 Words are organized by part of speech (adjectives, nouns, verbs, adverbs, prepositions) to enable grammatical structure generation.
 
 **Licensing:**
-- EFF Wordlists: Copyright © Electronic Frontier Foundation, licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/us/)
+- EFF-derived word lists: Based on work by the Electronic Frontier Foundation, licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/us/). Modified and reorganized by part of speech.
+- Hand-picked word lists: Copyright © 2026 Lyle Brulhart, licensed under MIT License
 - Application code: Copyright © 2026 Lyle Brulhart, licensed under MIT License
 
 ## License
