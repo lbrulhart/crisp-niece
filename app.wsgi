@@ -14,149 +14,155 @@ import sys
 import time
 from collections import defaultdict
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
 
-def load_words(path):
-    with open(path) as f:
-        return [w.strip() for w in f if w.strip()]
+class PassphraseGenerator:
+    def __init__(self, script_dir):
+        self.orig_chance = 70
+        self.max_requests_per_minute = 60
+        self.request_log = defaultdict(list)
 
-adjectives_orig = load_words(os.path.join(script_dir, "words/adjectives.txt"))
-adjectives_large = load_words(os.path.join(script_dir, "words/adjectives_large.txt"))
+        self.adjectives_orig = self._load_words(os.path.join(script_dir, "words/adjectives.txt"))
+        self.adjectives_large = self._load_words(os.path.join(script_dir, "words/adjectives_large.txt"))
+        self.verbs_orig = self._load_words(os.path.join(script_dir, "words/verbs.txt"))
+        self.verbs_large = self._load_words(os.path.join(script_dir, "words/verbs_large.txt"))
+        self.adverbs_orig = self._load_words(os.path.join(script_dir, "words/adverbs.txt"))
+        self.adverbs_large = self._load_words(os.path.join(script_dir, "words/adverbs_large.txt"))
+        self.nouns_orig = self._load_words(os.path.join(script_dir, "words/medium_nouns.txt"))
+        self.nouns_large = self._load_words(os.path.join(script_dir, "words/nouns_large.txt"))
+        self.prepositions = self._load_words(os.path.join(script_dir, "words/prepositions.txt"))
 
-verbs_orig      = load_words(os.path.join(script_dir, "words/verbs.txt"))
-verbs_large      = load_words(os.path.join(script_dir, "words/verbs_large.txt"))
+        self.word_counts = {
+            "adj": (len(self.adjectives_orig) * (self.orig_chance / 100)) + (
+                        len(self.adjectives_large) * ((100 - self.orig_chance) / 100)),
+            "noun": (len(self.nouns_orig) * (self.orig_chance / 100)) + (
+                        len(self.nouns_large) * ((100 - self.orig_chance) / 100)),
+            "verb": (len(self.verbs_orig) * (self.orig_chance / 100)) + (
+                        len(self.verbs_large) * ((100 - self.orig_chance) / 100)),
+            "adv": (len(self.adverbs_orig) * (self.orig_chance / 100)) + (
+                        len(self.adverbs_large) * ((100 - self.orig_chance) / 100)),
+            "prep": len(self.prepositions),
+        }
 
-adverbs_orig    = load_words(os.path.join(script_dir, "words/adverbs.txt"))
-adverbs_large    = load_words(os.path.join(script_dir, "words/adverbs_large.txt"))
+        self.templates = {
+            "very_short": [
+                ["adj", "noun", "verb"],
+                ["noun", "verb", "adv"],
+            ],
+            "short": [
+                ["adj", "noun", "verb", "adv"],
+                ["adj", "noun", "verb", "noun"],
+                ["noun", "verb", "adj", "noun"],
+            ],
+            "medium": [
+                ["adj", "noun", "verb", "adv"],
+                ["adj", "noun", "verb", "adj", "noun"],
+            ],
+            "long": [
+                ["adj", "noun", "verb", "adv"],
+                ["adj", "noun", "verb", "adj", "noun"],
+                ["adj", "noun", "verb", "prep", "adj", "noun"],
+            ],
+            "extralong": [
+                ["adj", "noun", "verb", "noun", "prep", "adj", "noun"],
+                ["adj", "noun", "verb", "adv", "noun", "prep", "adj", "noun"],
+                ["adj", "noun", "verb", "noun", "prep", "adj", "noun", "prep", "adj", "noun"],
+            ],
+        }
 
-nouns_orig      = load_words(os.path.join(script_dir, "words/medium_nouns.txt"))
-nouns_large      = load_words(os.path.join(script_dir, "words/nouns_large.txt"))
+    @staticmethod
+    def _load_words(path):
+        with open(path) as f:
+            return [w.strip() for w in f if w.strip()]
 
-prepositions = load_words(os.path.join(script_dir, "words/prepositions.txt"))
+    def calculate_entropy(self, pattern):
+        import math
+        total_entropy = 0
+        for part in pattern:
+            if part in self.word_counts:
+                total_entropy += math.log2(self.word_counts[part])
+        return total_entropy
 
-orig_chance = 70
+    def is_rate_limited(self, ip_address):
+        now = time.time()
+        self.request_log[ip_address] = [ts for ts in self.request_log[ip_address] if now - ts < 60]
 
-word_counts = {
-    "adj": (len(adjectives_orig) * (orig_chance/100)) + (len(adjectives_large) * ((100-orig_chance)/100)),
-    "noun": (len(nouns_orig) * (orig_chance/100)) + (len(nouns_large) * ((100-orig_chance)/100)),
-    "verb": (len(verbs_orig) * (orig_chance/100)) + (len(verbs_large) * ((100-orig_chance)/100)),
-    "adv": (len(adverbs_orig) * (orig_chance/100)) + (len(adverbs_large) * ((100-orig_chance)/100)),
-    "prep": len(prepositions),
-}
+        if len(self.request_log[ip_address]) >= self.max_requests_per_minute:
+            return True
 
-def calculate_entropy(pattern):
-    import math
+        self.request_log[ip_address].append(now)
+        return False
 
-    total_entropy = 0
-    for part in pattern:
-        if part in word_counts:
-            total_entropy += math.log2(word_counts[part])
-
-    return total_entropy
-
-request_log = defaultdict(list)
-max_requests_per_minute = 60
-
-def is_rate_limited(ip_address):
-    now = time.time()
-    request_log[ip_address] = [ts for ts in request_log[ip_address] if now - ts < 60]
-
-    if len(request_log[ip_address]) >= max_requests_per_minute:
-        return True
-
-    request_log[ip_address].append(now)
-    return False
-
-templates = {
-    "very_short": [
-        ["adj", "noun", "verb"],
-        ["noun", "verb", "adv"],
-    ],
-    "short": [
-        ["adj", "noun", "verb", "adv"],
-        ["adj", "noun", "verb", "noun"],
-        ["noun", "verb", "adj", "noun"],
-    ],
-    "medium": [
-        ["adj", "noun", "verb", "adv"],
-        ["adj", "noun", "verb", "adj", "noun"],
-    ],
-    "long": [
-        ["adj", "noun", "verb", "adv"],
-        ["adj", "noun", "verb", "adj", "noun"],
-        ["adj", "noun", "verb", "prep", "adj", "noun"],
-    ],
-    "extralong": [
-        ["adj", "noun", "verb", "noun", "prep", "adj", "noun"],
-        ["adj", "noun", "verb", "adv", "noun", "prep", "adj", "noun"],
-        ["adj", "noun", "verb", "noun", "prep", "adj", "noun", "prep", "adj", "noun"],
-    ],
-}
-
-def entropy_description(bits):
-    if bits < 35:
-        return "moderate"
-    elif bits < 50:
-        return "strong"
-    elif bits < 65:
-        return "very strong"
-    elif bits < 75:
-        return "extremely strong"
-    else:
-        return "virtually uncrackable"
-
-
-def generate_phrase(template, separator="", add_number=True, capitalize_mode='first', terminator='.'):
-    word_pools = {
-        "adj": (adjectives_orig, adjectives_large),
-        "noun": (nouns_orig, nouns_large),
-        "verb": (verbs_orig, verbs_large),
-        "adv": (adverbs_orig, adverbs_large),
-        "prep": (prepositions, prepositions),
-    }
-
-    phrase_words = []
-    word_sources = []
-    for pos in template:
-        orig_list, large_list = word_pools[pos]
-
-        if secrets.randbelow(100) < orig_chance:
-            word = secrets.choice(orig_list)
-            phrase_words.append(word)
-            word_sources.append(f"{pos}:orig({word})")
+    @staticmethod
+    def entropy_description(bits):
+        if bits < 35:
+            return "moderate"
+        elif bits < 50:
+            return "strong"
+        elif bits < 65:
+            return "very strong"
+        elif bits < 75:
+            return "extremely strong"
         else:
-            word = secrets.choice(large_list)
-            phrase_words.append(word)
-            word_sources.append(f"{pos}:large({word})")
+            return "virtually uncrackable"
 
-    if separator == "":
-        phrase_words = [''.join([w.capitalize() for w in word.split()]) for word in phrase_words]
-        result = ''.join(phrase_words)
-    elif separator is None:
-        if capitalize_mode == 'first':
-            phrase_words[0] = phrase_words[0].capitalize()
-        elif capitalize_mode == 'all':
-            phrase_words = [word.capitalize() for word in phrase_words]
-        result = ''.join(phrase_words)
-    else:
-        if capitalize_mode == 'first':
-            phrase_words[0] = phrase_words[0].capitalize()
-        elif capitalize_mode == 'all':
-            phrase_words = [word.capitalize() for word in phrase_words]
-        result = separator.join(phrase_words)
+    def generate_phrase(self, template, separator="", add_number=True, capitalize_mode='first', terminator='.'):
+        word_pools = {
+            "adj": (self.adjectives_orig, self.adjectives_large),
+            "noun": (self.nouns_orig, self.nouns_large),
+            "verb": (self.verbs_orig, self.verbs_large),
+            "adv": (self.adverbs_orig, self.adverbs_large),
+            "prep": (self.prepositions, self.prepositions),
+        }
 
-    if add_number:
-        number = str(secrets.randbelow(9) + 1)
-        if separator == " ":
-            result += " " + number
+        phrase_words = []
+        word_sources = []
+        for pos in template:
+            orig_list, large_list = word_pools[pos]
+
+            if secrets.randbelow(100) < self.orig_chance:
+                word = secrets.choice(orig_list)
+                phrase_words.append(word)
+                word_sources.append(f"{pos}:orig({word})")
+            else:
+                word = secrets.choice(large_list)
+                phrase_words.append(word)
+                word_sources.append(f"{pos}:large({word})")
+
+        if separator == "":
+            phrase_words = [''.join([w.capitalize() for w in word.split()]) for word in phrase_words]
+            result = ''.join(phrase_words)
+        elif separator is None:
+            if capitalize_mode == 'first':
+                phrase_words[0] = phrase_words[0].capitalize()
+            elif capitalize_mode == 'all':
+                phrase_words = [word.capitalize() for word in phrase_words]
+            result = ''.join(phrase_words)
         else:
-            result += number
+            if capitalize_mode == 'first':
+                phrase_words[0] = phrase_words[0].capitalize()
+            elif capitalize_mode == 'all':
+                phrase_words = [word.capitalize() for word in phrase_words]
+            result = separator.join(phrase_words)
 
-    return result + terminator, word_sources
+        if add_number:
+            number = str(secrets.randbelow(9) + 1)
+            if separator == " ":
+                result += " " + number
+            else:
+                result += number
 
-def application(environ, start_response):
-    path = environ.get('PATH_INFO', '')
-    if path.endswith('/about'):
+        return result + terminator, word_sources
+
+
+generator = PassphraseGenerator(os.path.dirname(os.path.abspath(__file__)))
+
+
+class PassphraseApp:
+    def __init__(self, phrase_generator):
+        self.generator = phrase_generator
+
+    @staticmethod
+    def handle_about(start_response):
         status = '200 OK'
         headers = [('Content-type', 'text/html; charset=utf-8')]
         start_response(status, headers)
@@ -223,66 +229,67 @@ def application(environ, start_response):
 </html>"""
         return [about_html.encode("utf-8")]
 
-    client_ip = environ.get('REMOTE_ADDR', 'unknown')
-
-    if is_rate_limited(client_ip):
+    def handle_rate_limit(self, start_response):
         status = '429 Too Many Requests'
         headers = [('Content-type', 'text/html; charset=utf-8')]
         start_response(status, headers)
         body = "<html><body><h1>Rate Limit Exceeded</h1><p>Please wait a moment before generating more passphrases.</p></body></html>"
         return [body.encode("utf-8")]
 
-    status = '200 OK'
-    headers = [
-        ('Content-type', 'text/html; charset=utf-8'),
-        ('X-Sector-5150', 'Classification: TOP SECRET // Source: The Crisp Niece // Status: Unstable')
-    ]
-    start_response(status, headers)
+    @staticmethod
+    def parse_query_params(query_string):
+        complexity = 'long'
+        if 'level=very_short' in query_string:
+            complexity = 'very_short'
+        elif 'level=short' in query_string:
+            complexity = 'short'
+        elif 'level=medium' in query_string:
+            complexity = 'medium'
+        elif 'level=extralong' in query_string:
+            complexity = 'extralong'
 
-    query_string = environ.get('QUERY_STRING', '')
-    complexity = 'long'
-    if 'level=very_short' in query_string:
-        complexity = 'very_short'
-    elif 'level=short' in query_string:
-        complexity = 'short'
-    elif 'level=medium' in query_string:
-        complexity = 'medium'
-    elif 'level=extralong' in query_string:
-        complexity = 'extralong'
-
-    separator = ' '
-    if 'sep=space' in query_string:
         separator = ' '
-    elif 'sep=dash' in query_string:
-        separator = '-'
-    elif 'sep=camel' in query_string:
-        separator = ''
-    elif 'sep=none' in query_string:
-        separator = None
+        if 'sep=space' in query_string:
+            separator = ' '
+        elif 'sep=dash' in query_string:
+            separator = '-'
+        elif 'sep=camel' in query_string:
+            separator = ''
+        elif 'sep=none' in query_string:
+            separator = None
 
-    add_number = 'num=yes' in query_string
+        add_number = 'num=yes' in query_string
 
-    capitalize_mode = 'first'
-    if 'cap=no' in query_string:
-        capitalize_mode = 'no'
-    elif 'cap=all' in query_string:
-        capitalize_mode = 'all'
-    elif 'cap=first' in query_string:
         capitalize_mode = 'first'
+        if 'cap=no' in query_string:
+            capitalize_mode = 'no'
+        elif 'cap=all' in query_string:
+            capitalize_mode = 'all'
+        elif 'cap=first' in query_string:
+            capitalize_mode = 'first'
 
-    terminator_type = 'none'
-    if 'term=period' in query_string:
-        terminator_type = 'period'
-    elif 'term=symbol' in query_string:
-        terminator_type = 'symbol'
+        terminator_type = 'none'
+        if 'term=period' in query_string:
+            terminator_type = 'period'
+        elif 'term=symbol' in query_string:
+            terminator_type = 'symbol'
 
-    def build_url(**kwargs):
+        return {
+            'complexity': complexity,
+            'separator': separator,
+            'add_number': add_number,
+            'capitalize_mode': capitalize_mode,
+            'terminator_type': terminator_type
+        }
+
+    @staticmethod
+    def build_url(complexity, separator, add_number, capitalize_mode, terminator_type, **overrides):
         params = []
-        level = kwargs.get('level', complexity)
-        sep = kwargs.get('sep', separator)
-        num = kwargs.get('num', add_number)
-        cap = kwargs.get('cap', capitalize_mode)
-        term = kwargs.get('term', terminator_type)
+        level = overrides.get('level', complexity)
+        sep = overrides.get('sep', separator)
+        num = overrides.get('num', add_number)
+        cap = overrides.get('cap', capitalize_mode)
+        term = overrides.get('term', terminator_type)
 
         if level != 'long':
             params.append(f'level={level}')
@@ -298,29 +305,51 @@ def application(environ, start_response):
 
         return '?' + '&'.join(params) if params else '?'
 
-    passphrase_items = []
-    template_list = templates[complexity]
-    print(f"[DEBUG] Complexity: {complexity}, Template pool size: {len(template_list)}, Templates: {template_list}", file=sys.stderr)
+    def generate_passphrases_html(self, params):
+        passphrase_items = []
+        template_list = self.generator.templates[params['complexity']]
+        print(
+            f"[DEBUG] Complexity: {params['complexity']}, Template pool size: {len(template_list)}, Templates: {template_list}",
+            file=sys.stderr)
 
-    for i in range(10):
-        template = secrets.choice(template_list)
-        print(f"[DEBUG] Passphrase {i+1}: Selected template: {template}", file=sys.stderr)
-        if terminator_type == 'symbol':
-            terminator = secrets.choice(['!', '?', '@', '#', '$', '%', '&', '*'])
-        elif terminator_type == 'none':
-            terminator = ''
-        else:
-            terminator = '.'
-        phrase, word_sources = generate_phrase(template, separator, add_number, capitalize_mode, terminator)
-        print(f"[DEBUG] Word sources: {', '.join(word_sources)}", file=sys.stderr)
-        entropy = calculate_entropy(template)
-        description = entropy_description(entropy)
-        escaped_phrase = phrase.replace("'", "\\'")
-        passphrase_items.append(f"<li><span class='passphrase'>{phrase}</span><button class='copy-btn' onclick='copyPassphrase(this, \"{escaped_phrase}\")' title='Copy to clipboard'><svg width='16' height='16' viewBox='0 0 16 16' fill='currentColor'><path d='M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2Z'/><path d='M2 6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1H6a3 3 0 0 1-3-3V6H2Z'/></svg></button><span class='entropy'>(~{entropy:.0f} bits - {description})</span></li>")
+        for i in range(10):
+            template = secrets.choice(template_list)
+            print(f"[DEBUG] Passphrase {i + 1}: Selected template: {template}", file=sys.stderr)
+            if params['terminator_type'] == 'symbol':
+                terminator = secrets.choice(['!', '?', '@', '#', '$', '%', '&', '*'])
+            elif params['terminator_type'] == 'none':
+                terminator = ''
+            else:
+                terminator = '.'
+            phrase, word_sources = self.generator.generate_phrase(
+                template,
+                params['separator'],
+                params['add_number'],
+                params['capitalize_mode'],
+                terminator
+            )
+            print(f"[DEBUG] Word sources: {', '.join(word_sources)}", file=sys.stderr)
+            entropy = self.generator.calculate_entropy(template)
+            description = self.generator.entropy_description(entropy)
+            escaped_phrase = phrase.replace("'", "\\'")
+            passphrase_items.append(
+                f"<li><span class='passphrase'>{phrase}</span><button class='copy-btn' onclick='copyPassphrase(this, \"{escaped_phrase}\")' title='Copy to clipboard'><svg width='16' height='16' viewBox='0 0 16 16' fill='currentColor'><path d='M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2Z'/><path d='M2 6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1H6a3 3 0 0 1-3-3V6H2Z'/></svg></button><span class='entropy'>(~{entropy:.0f} bits - {description})</span></li>")
 
-    passphrases_html = '\n'.join(passphrase_items)
+        return '\n'.join(passphrase_items)
 
-    body = f"""<html>
+    def render_main_page(self, params):
+        complexity = params['complexity']
+        separator = params['separator']
+        add_number = params['add_number']
+        capitalize_mode = params['capitalize_mode']
+        terminator_type = params['terminator_type']
+
+        def build_url(**kwargs):
+            return self.build_url(complexity, separator, add_number, capitalize_mode, terminator_type, **kwargs)
+
+        passphrases_html = self.generate_passphrases_html(params)
+
+        body = f"""<html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Secure Surreal Passphrases - where crisp nieces promise ruin</title>
@@ -473,8 +502,36 @@ Copyright &copy; 2026 | Licensed under <a href='https://opensource.org/licenses/
 
 </body>
 </html>"""
+        return body
 
-    return [body.encode("utf-8")]
+    def __call__(self, environ, start_response):
+        path = environ.get('PATH_INFO', '')
+        if path.endswith('/about'):
+            return self.handle_about(start_response)
+
+        client_ip = environ.get('REMOTE_ADDR', 'unknown')
+        if self.generator.is_rate_limited(client_ip):
+            return self.handle_rate_limit(start_response)
+
+        status = '200 OK'
+        headers = [
+            ('Content-type', 'text/html; charset=utf-8'),
+            ('X-Sector-5150', 'Classification: TOP SECRET // Source: The Crisp Niece // Status: Unstable')
+        ]
+        start_response(status, headers)
+
+        query_string = environ.get('QUERY_STRING', '')
+        params = self.parse_query_params(query_string)
+        body = self.render_main_page(params)
+
+        return [body.encode("utf-8")]
+
+
+app = PassphraseApp(generator)
+
+
+def application(environ, start_response):
+    return app(environ, start_response)
 
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server
