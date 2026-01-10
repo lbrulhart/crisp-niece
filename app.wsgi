@@ -8,22 +8,18 @@
 # Licensed under GNU GPL v3 or later
 # https://www.eff.org/document/passphrase-wordlists
 
-import secrets
-import math
-import time
 import os
+import secrets
 import sys
+import time
 from collections import defaultdict
 
-# Get the directory where this script is located
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Load word lists
 def load_words(path):
     with open(path) as f:
         return [w.strip() for w in f if w.strip()]
 
-# Load both tiers
 adjectives_orig = load_words(os.path.join(script_dir, "words/adjectives.txt"))
 adjectives_large = load_words(os.path.join(script_dir, "words/adjectives_large.txt"))
 
@@ -38,8 +34,7 @@ nouns_large      = load_words(os.path.join(script_dir, "words/nouns_large.txt"))
 
 prepositions = load_words(os.path.join(script_dir, "words/prepositions.txt"))
 
-# Probability configuration
-orig_chance = 70  # Percent chance to pick from a hand-picked list
+orig_chance = 70
 
 word_counts = {
     "adj": (len(adjectives_orig) * (orig_chance/100)) + (len(adjectives_large) * ((100-orig_chance)/100)),
@@ -49,47 +44,26 @@ word_counts = {
     "prep": len(prepositions),
 }
 
-def calculate_entropy(pattern, orig_chance):
-    """Calculate entropy in bits for a given pattern"""
+def calculate_entropy(pattern):
     import math
-
-    adj_pool = (len(adjectives_orig) * (orig_chance/100)) + (len(adjectives_large) * ((100-orig_chance)/100))
-    adv_pool = (len(adverbs_orig) * (orig_chance/100)) + (len(adverbs_large) * ((100-orig_chance)/100))
-    verb_pool = (len(verbs_orig) * (orig_chance/100)) + (len(verbs_large) * ((100-orig_chance)/100))
-    noun_pool = (len(nouns_orig) * (orig_chance/100)) + (len(nouns_large) * ((100-orig_chance)/100))
-    prep_pool = len(prepositions)
-
-    pools = {
-        "adj": adj_pool,
-        "adv": adv_pool,
-        "verb": verb_pool,
-        "noun": noun_pool,
-        "prep": prep_pool
-    }
 
     total_entropy = 0
     for part in pattern:
-        if part in pools:
-            total_entropy += math.log2(pools[part])
+        if part in word_counts:
+            total_entropy += math.log2(word_counts[part])
 
     return total_entropy
 
-# Simple rate limiting: track requests per IP
-# Format: {ip: [(timestamp1, timestamp2, ...)]}
 request_log = defaultdict(list)
 max_requests_per_minute = 60
 
 def is_rate_limited(ip_address):
-    """Check if IP has exceeded the rate limit"""
     now = time.time()
-    # Clean up old entries (older than 1 minute)
     request_log[ip_address] = [ts for ts in request_log[ip_address] if now - ts < 60]
 
-    # Check if over limit
     if len(request_log[ip_address]) >= max_requests_per_minute:
         return True
 
-    # Log this request
     request_log[ip_address].append(now)
     return False
 
@@ -120,7 +94,6 @@ templates = {
 }
 
 def entropy_description(bits):
-    """Convert entropy bits to human-readable strength description"""
     if bits < 35:
         return "moderate"
     elif bits < 50:
@@ -139,7 +112,7 @@ def generate_phrase(template, separator="", add_number=True, capitalize_mode='fi
         "noun": (nouns_orig, nouns_large),
         "verb": (verbs_orig, verbs_large),
         "adv": (adverbs_orig, adverbs_large),
-        "prep": (prepositions, prepositions),  # Preps don't have a large tier yet
+        "prep": (prepositions, prepositions),
     }
 
     phrase_words = []
@@ -147,7 +120,6 @@ def generate_phrase(template, separator="", add_number=True, capitalize_mode='fi
     for pos in template:
         orig_list, large_list = word_pools[pos]
 
-        # Weighted selection: 70% chance for hand-picked, 30% for EFF
         if secrets.randbelow(100) < orig_chance:
             word = secrets.choice(orig_list)
             phrase_words.append(word)
@@ -157,41 +129,32 @@ def generate_phrase(template, separator="", add_number=True, capitalize_mode='fi
             phrase_words.append(word)
             word_sources.append(f"{pos}:large({word})")
 
-    # Handle different separator types
     if separator == "":
-        # CamelCase: always capitalize each word and remove spaces within multi-word entries
         phrase_words = [''.join([w.capitalize() for w in word.split()]) for word in phrase_words]
         result = ''.join(phrase_words)
     elif separator is None:
-        # None: no separator, respect capitalization option
         if capitalize_mode == 'first':
             phrase_words[0] = phrase_words[0].capitalize()
         elif capitalize_mode == 'all':
             phrase_words = [word.capitalize() for word in phrase_words]
         result = ''.join(phrase_words)
     else:
-        # Space or dash: join with separator, respect the capitalization option
         if capitalize_mode == 'first':
             phrase_words[0] = phrase_words[0].capitalize()
         elif capitalize_mode == 'all':
             phrase_words = [word.capitalize() for word in phrase_words]
         result = separator.join(phrase_words)
 
-    # Add a random number at the end if requested (1-9, no zero to avoid confusion with O)
     if add_number:
         number = str(secrets.randbelow(9) + 1)
         if separator == " ":
-            # Space separator: add space before number
             result += " " + number
         else:
-            # Dash or CamelCase: just append the number
             result += number
 
     return result + terminator, word_sources
 
-# This is the WSGI entry point Apache expects
 def application(environ, start_response):
-    # Handle about page
     path = environ.get('PATH_INFO', '')
     if path.endswith('/about'):
         status = '200 OK'
@@ -260,10 +223,8 @@ def application(environ, start_response):
 </html>"""
         return [about_html.encode("utf-8")]
 
-    # Get client IP for rate limiting
     client_ip = environ.get('REMOTE_ADDR', 'unknown')
 
-    # Check rate limit
     if is_rate_limited(client_ip):
         status = '429 Too Many Requests'
         headers = [('Content-type', 'text/html; charset=utf-8')]
@@ -278,9 +239,8 @@ def application(environ, start_response):
     ]
     start_response(status, headers)
 
-    # Parse query string for complexity level and separator
     query_string = environ.get('QUERY_STRING', '')
-    complexity = 'long'  # default
+    complexity = 'long'
     if 'level=very_short' in query_string:
         complexity = 'very_short'
     elif 'level=short' in query_string:
@@ -290,8 +250,7 @@ def application(environ, start_response):
     elif 'level=extralong' in query_string:
         complexity = 'extralong'
 
-    # Parse separator
-    separator = ' '  # default (Space)
+    separator = ' '
     if 'sep=space' in query_string:
         separator = ' '
     elif 'sep=dash' in query_string:
@@ -301,11 +260,9 @@ def application(environ, start_response):
     elif 'sep=none' in query_string:
         separator = None
 
-    # Parse add_number option
-    add_number = 'num=yes' in query_string  # default no
+    add_number = 'num=yes' in query_string
 
-    # Parse capitalization option
-    capitalize_mode = 'first'  # default: capitalize the first word only
+    capitalize_mode = 'first'
     if 'cap=no' in query_string:
         capitalize_mode = 'no'
     elif 'cap=all' in query_string:
@@ -313,14 +270,12 @@ def application(environ, start_response):
     elif 'cap=first' in query_string:
         capitalize_mode = 'first'
 
-    # Parse terminator option
-    terminator_type = 'none'  # default none
+    terminator_type = 'none'
     if 'term=period' in query_string:
         terminator_type = 'period'
     elif 'term=symbol' in query_string:
         terminator_type = 'symbol'
 
-    # Helper function to build clean URLs with only non-default params
     def build_url(**kwargs):
         params = []
         level = kwargs.get('level', complexity)
@@ -343,7 +298,6 @@ def application(environ, start_response):
 
         return '?' + '&'.join(params) if params else '?'
 
-    # Generate passphrases
     passphrase_items = []
     template_list = templates[complexity]
     print(f"[DEBUG] Complexity: {complexity}, Template pool size: {len(template_list)}, Templates: {template_list}", file=sys.stderr)
@@ -351,7 +305,6 @@ def application(environ, start_response):
     for i in range(10):
         template = secrets.choice(template_list)
         print(f"[DEBUG] Passphrase {i+1}: Selected template: {template}", file=sys.stderr)
-        # Generate a terminator for each phrase
         if terminator_type == 'symbol':
             terminator = secrets.choice(['!', '?', '@', '#', '$', '%', '&', '*'])
         elif terminator_type == 'none':
@@ -360,9 +313,8 @@ def application(environ, start_response):
             terminator = '.'
         phrase, word_sources = generate_phrase(template, separator, add_number, capitalize_mode, terminator)
         print(f"[DEBUG] Word sources: {', '.join(word_sources)}", file=sys.stderr)
-        entropy = calculate_entropy(template, orig_chance)
+        entropy = calculate_entropy(template)
         description = entropy_description(entropy)
-        # Escape single quotes for JavaScript
         escaped_phrase = phrase.replace("'", "\\'")
         passphrase_items.append(f"<li><span class='passphrase'>{phrase}</span><button class='copy-btn' onclick='copyPassphrase(this, \"{escaped_phrase}\")' title='Copy to clipboard'><svg width='16' height='16' viewBox='0 0 16 16' fill='currentColor'><path d='M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2Z'/><path d='M2 6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1H6a3 3 0 0 1-3-3V6H2Z'/></svg></button><span class='entropy'>(~{entropy:.0f} bits - {description})</span></li>")
 
@@ -421,7 +373,6 @@ li {{ margin: 10px 0; padding: 10px; background: #f8f9fa; border-left: 4px solid
 <script>
 function copyPassphrase(button, text) {{
   navigator.clipboard.writeText(text).then(() => {{
-    // Change to checkmark SVG
     button.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>';
     setTimeout(() => {{
       button.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2Z"/><path d="M2 6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1H6a3 3 0 0 1-3-3V6H2Z"/></svg>';
@@ -527,7 +478,6 @@ Copyright &copy; 2026 | Licensed under <a href='https://opensource.org/licenses/
 
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server
-    # Port 5150: Area 51 + Section 5150 (Involuntary Hold)
     print("Initiating Sector 5150...")
     print("Access the generator at: http://localhost:5150")
     try:
