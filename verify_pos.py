@@ -13,10 +13,10 @@ except ImportError:
     print("Then run: python -c 'import nltk; nltk.download(\"wordnet\")'")
     exit(1)
 
-WORDS_DIR = "words"
+words_dir = "words"
 
 # Map file names to expected POS
-FILES = {
+files = {
     'adjectives_large.txt': {'a', 's'},  # adjective and adjective satellite
     'adverbs_large.txt': {'r'},          # adverb
     'nouns_large.txt': {'n'},            # noun
@@ -32,7 +32,7 @@ def get_word_pos_tags(word):
 
 def verify_file(filename, expected_pos):
     """Verify words in file match expected POS"""
-    filepath = os.path.join(WORDS_DIR, filename)
+    filepath = os.path.join(words_dir, filename)
 
     if not os.path.exists(filepath):
         print(f"⚠️  {filename} not found")
@@ -107,7 +107,7 @@ def main():
     print("Using NLTK WordNet for validation\n")
 
     results = {}
-    for filename, expected_pos in FILES.items():
+    for filename, expected_pos in files.items():
         results[filename] = verify_file(filename, expected_pos)
 
     # Overall summary

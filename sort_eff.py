@@ -9,8 +9,8 @@ import os
 from collections import defaultdict
 
 # Paths
-EFF_LIST = "eff_large_wordlist.txt"
-WORDS_DIR = "words"
+eff_list = "eff_large_wordlist.txt"
+words_dir = "words"
 
 def conjugate_to_3rd_person(verb):
     """Convert base verb to 3rd person singular (he/she/it form)"""
@@ -56,7 +56,7 @@ def conjugate_to_3rd_person(verb):
     return verb + 's'
 
 # Suffix patterns - conservative to minimize false positives
-SUFFIX_RULES = {
+suffix_rules = {
     'noun': [
         'ness', 'ment', 'tion', 'sion', 'ance', 'ence', 'ship', 'hood',
         'ity', 'ism', 'ist', 'ery', 'dom'
@@ -85,7 +85,7 @@ def get_pos_by_suffix(word):
         return None  # Let WordNet handle these
 
     # Check noun suffixes first (most reliable)
-    for suffix in SUFFIX_RULES['noun']:
+    for suffix in suffix_rules['noun']:
         if word_lower.endswith(suffix) and len(word) > len(suffix) + 2:
             return 'noun'
 
@@ -112,12 +112,12 @@ def get_pos_by_suffix(word):
             return 'adverb'
 
     # Check adjective suffixes
-    for suffix in SUFFIX_RULES['adjective']:
+    for suffix in suffix_rules['adjective']:
         if word_lower.endswith(suffix) and len(word) > len(suffix) + 2:
             return 'adjective'
 
     # Check verb suffixes (least reliable, many conflicts)
-    for suffix in SUFFIX_RULES['verb']:
+    for suffix in suffix_rules['verb']:
         if word_lower.endswith(suffix) and len(word) > len(suffix) + 2:
             return 'verb'
 
@@ -170,15 +170,15 @@ def categorize_with_wordnet(words):
 
 def sieve_eff():
     """Sort EFF wordlist and create _large.txt files"""
-    if not os.path.exists(EFF_LIST):
-        print(f"Error: {EFF_LIST} not found.")
+    if not os.path.exists(eff_list):
+        print(f"Error: {eff_list} not found.")
         return
 
     print("Analyzing EFF list using suffix patterns + WordNet...\n")
 
     # 1. Load the EFF list words
     eff_words = []
-    with open(EFF_LIST, 'r') as f:
+    with open(eff_list, 'r') as f:
         for line in f:
             parts = line.strip().split()
             if parts:
@@ -223,7 +223,7 @@ def sieve_eff():
 
             # Save truly unknown words
             if wordnet_results['still_unknown']:
-                unknown_file = os.path.join(WORDS_DIR, 'unknown_words.txt')
+                unknown_file = os.path.join(words_dir, 'unknown_words.txt')
                 with open(unknown_file, 'w') as f:
                     f.write('\n'.join(sorted(wordnet_results['still_unknown'])))
                 print(f"\n  {len(wordnet_results['still_unknown'])} words still unknown, saved to {unknown_file}")
@@ -239,8 +239,8 @@ def sieve_eff():
     # 5. Merge and create _large files
     print("\nStep 3: Creating _large files...")
     for pos, (base_file, large_file) in mapping.items():
-        base_path = os.path.join(WORDS_DIR, base_file)
-        large_path = os.path.join(WORDS_DIR, large_file)
+        base_path = os.path.join(words_dir, base_file)
+        large_path = os.path.join(words_dir, large_file)
 
         # Load existing curated words
         existing = set()
@@ -298,7 +298,7 @@ def cleanup_incorrect_words(mapping):
     total_removed = 0
 
     for pos, (base_file, large_file) in mapping.items():
-        large_path = os.path.join(WORDS_DIR, large_file)
+        large_path = os.path.join(words_dir, large_file)
         expected_pos = pos_map[pos]
 
         with open(large_path, 'r') as f:

@@ -6,11 +6,11 @@ Calculate entropy for passphrase patterns based on current word lists
 import os
 import math
 
-WORDS_DIR = "words"
+words_dir = "words"
 
 def load_word_count(filename):
     """Load and count words from a file"""
-    filepath = os.path.join(WORDS_DIR, filename)
+    filepath = os.path.join(words_dir, filename)
     if not os.path.exists(filepath):
         print(f"Warning: {filename} not found")
         return 0
