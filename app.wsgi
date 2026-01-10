@@ -431,7 +431,7 @@ function copyPassphrase(button, text) {{
 </script>
 </head>
 <body>
-<h1>Secure Surreal Passphrases <span style='font-size: 0.6em; color: #666; font-weight: normal;'>where crisp nieces promise ruin</span></h1>
+<h1>Secure Surreal Passphrases</h1>
 
 <div class='top-buttons'>
 <a href='{build_url()}' class='generate-btn'>Generate New</a>
