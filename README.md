@@ -2,6 +2,16 @@
 
 A web-based passphrase generator that creates memorable, grammatically-structured passphrases with high entropy for security.
 
+## Why Another Password Generator?
+
+**The Diceware Problem:** Traditional passphrase generators give you random words like "correct horse battery staple" - secure, but hard to remember because there's no connection between the words.
+
+**The Solution:** This generates *grammatical* phrases that tell a story: "Ancient emperor travels carefully through crystal" or "Reckless penguin overthinks wildly."
+
+Your brain naturally creates mental images from grammatical sentences. The surreal combinations are often accidentally funny, making them even more memorable. Same entropy as random words, but actually memorable.
+
+**The Philosophy:** Entropy comes from word selection, not symbols. Numbers and special characters should be opt-in for systems that require them, not defaults that clutter otherwise clean passphrases.
+
 ## Features
 
 - **Grammar-based generation**: Creates passphrases using proper grammatical structure (adjectives, nouns, verbs, adverbs, prepositions)
@@ -53,12 +63,14 @@ sudo systemctl restart httpd
 1. Visit the web interface
 2. Choose complexity level (Very Short to Extra Long)
 3. Customize options:
-   - **Separator**: Space, Dash, CamelCase, or None
+   - **Separator**: Space (default), Dash, CamelCase, or None
+   - **Capitalize**: First word (default), All words, or None
    - **Add Number**: Optionally append a random digit (1-9)
-   - **Capitalize First**: Toggle first word capitalization
-   - **Terminator**: None, Period, or Random Symbol
+   - **Terminator**: None (default), Period, or Random Symbol
 4. Click "Generate New" to create 10 new passphrases
 5. Click the 📑 icon to copy any passphrase to clipboard
+
+**Defaults:** Long (4-6 words), space separator, capitalize first word only, no number, no terminator. Clean and sentence-like: "Ancient emperor travels carefully through crystal"
 
 ## Security
 
@@ -70,16 +82,21 @@ sudo systemctl restart httpd
 
 ## Word Lists
 
-Word lists are curated from the [EFF's Passphrase Wordlists](https://www.eff.org/document/passphrase-wordlists), organized by part of speech for grammatical structure.
+Word lists use a weighted 70/30 mix:
+- **70%**: Hand-picked words chosen for clarity, memorability, and surreal combinations
+- **30%**: [EFF's Long Passphrase Wordlist](https://www.eff.org/document/passphrase-wordlists) for additional entropy
 
-- EFF Wordlists: Copyright © 2026 Electronic Frontier Foundation, licensed under GNU GPL v3 or later
+Words are organized by part of speech (adjectives, nouns, verbs, adverbs, prepositions) to enable grammatical structure generation.
+
+**Licensing:**
+- EFF Wordlists: Copyright © Electronic Frontier Foundation, licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/us/)
 - Application code: Copyright © 2026 Lyle Brulhart, licensed under MIT License
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-The word lists used are derived from the EFF's Passphrase Wordlists and are licensed under GNU GPL v3 or later.
+The EFF word lists used are licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/us/).
 
 ## Credits
 
