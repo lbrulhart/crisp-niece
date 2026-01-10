@@ -39,15 +39,40 @@ nouns_large      = load_words(os.path.join(script_dir, "words/nouns_large.txt"))
 prepositions = load_words(os.path.join(script_dir, "words/prepositions.txt"))
 
 # Probability configuration
-ORIG_CHANCE = 70  # Percent chance to pick from a hand-picked list
+orig_chance = 70  # Percent chance to pick from a hand-picked list
 
 word_counts = {
-    "adj": (len(adjectives_orig) * (ORIG_CHANCE/100)) + (len(adjectives_large) * ((100-ORIG_CHANCE)/100)),
-    "noun": (len(nouns_orig) * (ORIG_CHANCE/100)) + (len(nouns_large) * ((100-ORIG_CHANCE)/100)),
-    "verb": (len(verbs_orig) * (ORIG_CHANCE/100)) + (len(verbs_large) * ((100-ORIG_CHANCE)/100)),
-    "adv": (len(adverbs_orig) * (ORIG_CHANCE/100)) + (len(adverbs_large) * ((100-ORIG_CHANCE)/100)),
+    "adj": (len(adjectives_orig) * (orig_chance/100)) + (len(adjectives_large) * ((100-orig_chance)/100)),
+    "noun": (len(nouns_orig) * (orig_chance/100)) + (len(nouns_large) * ((100-orig_chance)/100)),
+    "verb": (len(verbs_orig) * (orig_chance/100)) + (len(verbs_large) * ((100-orig_chance)/100)),
+    "adv": (len(adverbs_orig) * (orig_chance/100)) + (len(adverbs_large) * ((100-orig_chance)/100)),
     "prep": len(prepositions),
 }
+
+def calculate_entropy(pattern, orig_chance):
+    """Calculate entropy in bits for a given pattern"""
+    import math
+
+    adj_pool = (len(adjectives_orig) * (orig_chance/100)) + (len(adjectives_large) * ((100-orig_chance)/100))
+    adv_pool = (len(adverbs_orig) * (orig_chance/100)) + (len(adverbs_large) * ((100-orig_chance)/100))
+    verb_pool = (len(verbs_orig) * (orig_chance/100)) + (len(verbs_large) * ((100-orig_chance)/100))
+    noun_pool = (len(nouns_orig) * (orig_chance/100)) + (len(nouns_large) * ((100-orig_chance)/100))
+    prep_pool = len(prepositions)
+
+    pools = {
+        "adj": adj_pool,
+        "adv": adv_pool,
+        "verb": verb_pool,
+        "noun": noun_pool,
+        "prep": prep_pool
+    }
+
+    total_entropy = 0
+    for part in pattern:
+        if part in pools:
+            total_entropy += math.log2(pools[part])
+
+    return total_entropy
 
 # Simple rate limiting: track requests per IP
 # Format: {ip: [(timestamp1, timestamp2, ...)]}
@@ -94,13 +119,6 @@ templates = {
     ],
 }
 
-def calculate_entropy(template):
-    """Calculate bits of entropy for a given template"""
-    combinations = 1
-    for pos in template:
-        combinations *= word_counts[pos]
-    return math.log2(combinations)
-
 def entropy_description(bits):
     """Convert entropy bits to human-readable strength description"""
     if bits < 35:
@@ -130,7 +148,7 @@ def generate_phrase(template, separator="", add_number=True, capitalize_mode='fi
         orig_list, large_list = word_pools[pos]
 
         # Weighted selection: 70% chance for hand-picked, 30% for EFF
-        if secrets.randbelow(100) < ORIG_CHANCE:
+        if secrets.randbelow(100) < orig_chance:
             word = secrets.choice(orig_list)
             phrase_words.append(word)
             word_sources.append(f"{pos}:orig({word})")
@@ -329,6 +347,7 @@ def application(environ, start_response):
     passphrase_items = []
     template_list = templates[complexity]
     print(f"[DEBUG] Complexity: {complexity}, Template pool size: {len(template_list)}, Templates: {template_list}", file=sys.stderr)
+
     for i in range(10):
         template = secrets.choice(template_list)
         print(f"[DEBUG] Passphrase {i+1}: Selected template: {template}", file=sys.stderr)
@@ -341,7 +360,7 @@ def application(environ, start_response):
             terminator = '.'
         phrase, word_sources = generate_phrase(template, separator, add_number, capitalize_mode, terminator)
         print(f"[DEBUG] Word sources: {', '.join(word_sources)}", file=sys.stderr)
-        entropy = calculate_entropy(template)
+        entropy = calculate_entropy(template, orig_chance)
         description = entropy_description(entropy)
         # Escape single quotes for JavaScript
         escaped_phrase = phrase.replace("'", "\\'")
