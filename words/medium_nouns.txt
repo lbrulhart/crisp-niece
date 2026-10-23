@@ -34,7 +34,6 @@ aurora
 avenue
 axe
 axle
-baby
 badge
 bag
 bakery
@@ -96,7 +95,6 @@ boundary
 bouquet
 bowl
 box
-boy
 bracelet
 bramble
 brass
@@ -154,7 +152,6 @@ casket
 castle
 cat
 cathedral
-cattle
 cave
 cavern
 cedar
@@ -176,11 +173,9 @@ chariot
 charity
 charm
 chasm
-cherry
 chest
 chicken
 chief
-child
 chimney
 chin
 choir
@@ -389,7 +384,6 @@ geyser
 ghost
 ginger
 giraffe
-girl
 glacier
 glade
 glass
@@ -470,7 +464,6 @@ icicle
 idol
 import
 income
-infant
 inn
 instinct
 iris
@@ -631,7 +624,6 @@ notion
 nourishment
 novel
 nugget
-nursery
 nut
 nutmeg
 oak
@@ -643,7 +635,6 @@ observer
 obstacle
 ocean
 office
-offspring
 olive
 onion
 opal
@@ -652,7 +643,6 @@ orange
 orchard
 orchid
 organ
-orphan
 ostrich
 otter
 outcome
@@ -705,7 +695,6 @@ pen
 pencil
 peninsula
 penny
-people
 pepper
 perfume
 pet
@@ -727,7 +716,6 @@ pine
 pinnacle
 pioneer
 pirate
-pistol
 pitcher
 plague
 plane
@@ -790,7 +778,6 @@ raisin
 ranch
 ranger
 ransom
-rapids
 rascal
 raspberry
 rattle
@@ -812,7 +799,6 @@ rhubarb
 rhythm
 ribbon
 ridge
-rifle
 rim
 rival
 river
@@ -863,7 +849,6 @@ scepter
 scholar
 school
 schooner
-scissors
 scoundrel
 scout
 scribe
@@ -1094,7 +1079,6 @@ verse
 vessel
 vest
 veteran
-victim
 victor
 vigil
 village
@@ -1143,7 +1127,7 @@ wolf
 woman
 woodland
 woodpecker
-woods
+wood
 wool
 word
 workshop
@@ -1158,7 +1142,6 @@ yard
 yarn
 yew
 yolk
-youth
 zebra
 zenith
 zephyr

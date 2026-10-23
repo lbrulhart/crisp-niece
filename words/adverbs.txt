@@ -5,7 +5,6 @@ accordingly
 actively
 actually
 adequately
-almost
 already
 also
 always
@@ -170,7 +169,6 @@ nicely
 nonetheless
 normally
 notably
-obediently
 obviously
 occasionally
 oddly
@@ -209,11 +207,9 @@ publicly
 purely
 quickly
 quietly
-quite
 randomly
 rapidly
 rarely
-rather
 readily
 really
 reasonably
@@ -251,7 +247,6 @@ softly
 solely
 solidly
 somehow
-somewhat
 soon
 specially
 specifically
@@ -289,7 +284,6 @@ usually
 utterly
 vaguely
 vastly
-very
 violently
 virtually
 visibly

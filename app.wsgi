@@ -64,7 +64,7 @@ class PassphraseGenerator:
             ],
             "extralong": [
                 ["adj", "noun", "verb", "noun", "prep", "adj", "noun"],
-                ["adj", "noun", "verb", "adv", "noun", "prep", "adj", "noun"],
+                ["adj", "noun", "verb", "noun", "adv", "prep", "adj", "noun"],
                 ["adj", "noun", "verb", "noun", "prep", "adj", "noun", "prep", "adj", "noun"],
             ],
         }

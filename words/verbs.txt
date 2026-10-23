@@ -35,7 +35,6 @@ bounces
 bows
 breaks
 breathes
-breeds
 brings
 brushes
 builds
@@ -57,7 +56,6 @@ chases
 checks
 chews
 chirps
-chokes
 chooses
 claps
 cleans
@@ -129,7 +127,6 @@ drinks
 drips
 drives
 drops
-drowns
 dumps
 earns
 eats
@@ -258,7 +255,6 @@ judges
 jumps
 keeps
 kicks
-kills
 kisses
 kneels
 knits
@@ -275,7 +271,6 @@ leaps
 learns
 leaves
 lets
-licks
 lies
 lifts
 likes
@@ -313,7 +308,6 @@ needs
 nods
 notes
 notices
-obeys
 objects
 observes
 obtains
@@ -350,7 +344,6 @@ pities
 places
 plans
 plays
-pleases
 plows
 points
 pokes
@@ -371,7 +364,6 @@ presents
 presses
 pretends
 prevents
-pricks
 prints
 proceeds
 produces
@@ -443,12 +435,10 @@ robs
 rocks
 rolls
 rots
-rubs
 ruins
 runs
 rushes
 sacrifices
-satisfies
 saves
 saws
 says
@@ -458,7 +448,6 @@ scolds
 scrapes
 scratches
 screams
-screws
 seals
 searches
 selects
@@ -477,7 +466,6 @@ shelters
 shines
 shivers
 shocks
-shoots
 shops
 shouts
 shows
@@ -541,15 +529,12 @@ strengthens
 stretches
 strikes
 strings
-strips
-strokes
 struggles
 studies
 stuffs
 stumbles
 subscribes
 succeeds
-sucks
 suffers
 suggests
 suits
@@ -562,7 +547,6 @@ surrounds
 surveys
 suspects
 suspends
-swallows
 swears
 sweats
 sweeps
@@ -580,7 +564,6 @@ thinks
 throws
 ties
 tops
-touches
 trains
 travels
 treats

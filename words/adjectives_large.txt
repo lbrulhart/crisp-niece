@@ -1,3 +1,4 @@
+abdominal
 ablaze
 able
 abnormal
@@ -13,6 +14,7 @@ actual
 adequate
 advanced
 adventurous
+affluent
 aflame
 afloat
 aflutter
@@ -30,6 +32,7 @@ alert
 alienable
 alive
 alkaline
+almighty
 alone
 aloof
 amazing
@@ -37,6 +40,7 @@ ambiguous
 ambitious
 amendable
 amiable
+amino
 amniotic
 ample
 amusable
@@ -46,6 +50,7 @@ anemic
 angelic
 angry
 angular
+annoying
 another
 antitoxic
 antitrust
@@ -72,7 +77,6 @@ audacious
 audible
 august
 authentic
-autistic
 automatic
 available
 average
@@ -89,7 +93,6 @@ barbed
 bare
 basic
 beautiful
-best
 better
 big
 bitter
@@ -112,7 +115,7 @@ boney
 bony
 boozy
 boring
-both
+botanical
 bouncy
 boundless
 bountiful
@@ -122,7 +125,6 @@ brave
 breezy
 brief
 bright
-brightly colored
 brilliant
 brisk
 brittle
@@ -140,7 +142,6 @@ calm
 caloric
 candied
 capable
-captive
 cardiac
 careful
 careless
@@ -149,6 +150,7 @@ casual
 catatonic
 catchable
 catchy
+catty
 causal
 cautious
 celestial
@@ -157,16 +159,14 @@ certain
 charming
 chaste
 chatty
-cheap
 cheerful
 cheesy
 chewable
 chewy
-childish
 childless
-childlike
 chirpy
 choosy
+chosen
 chubby
 chummy
 circular
@@ -200,7 +200,6 @@ comfortable
 comfy
 comic
 common
-compacter
 complex
 concave
 conducive
@@ -238,7 +237,6 @@ crispy
 crucial
 crude
 cruel
-crummiest
 crummy
 crushable
 cryptic
@@ -301,7 +299,6 @@ dimmer
 dingy
 direct
 directive
-dirty
 disloyal
 disparate
 distant
@@ -310,11 +307,8 @@ dividable
 divisible
 divisive
 dizzy
-doable
-docile
 dodgy
 domestic
-dominant
 dorsal
 double
 down
@@ -336,11 +330,9 @@ dry
 dual
 dull
 duller
-dumb
 durable
 dutiful
 dynamic
-dyslexic
 each
 eager
 early
@@ -349,7 +341,6 @@ earthen
 earthlike
 earthly
 earthy
-easiest
 eastbound
 easy
 eatable
@@ -360,6 +351,7 @@ efficient
 egotistic
 elastic
 elderly
+eldest
 electable
 elective
 electric
@@ -393,7 +385,6 @@ erratic
 escapable
 essential
 eternal
-ethnic
 evasive
 even
 eventual
@@ -408,7 +399,6 @@ exclusive
 excretory
 excusable
 exemplary
-exotic
 expansive
 expectant
 expensive
@@ -461,7 +451,6 @@ firm
 first
 fiscal
 fixed
-flaccid
 flaky
 flammable
 flashy
@@ -502,7 +491,6 @@ frozen
 full
 funny
 furious
-galore
 gangly
 generous
 gentle
@@ -527,8 +515,8 @@ gnarly
 golden
 good
 gooey
+goofy
 gorgeous
-gory
 graceful
 graceless
 gracious
@@ -549,6 +537,7 @@ groggy
 groovy
 gross
 grueling
+grumbly
 guidable
 guileless
 guilty
@@ -564,10 +553,7 @@ handsome
 handwoven
 haphazard
 happier
-happiest
 happy
-hard
-hardcore
 hardy
 harmful
 harmless
@@ -582,6 +568,7 @@ heavy
 hefty
 helpful
 helpless
+herbal
 hesitant
 high
 hollow
@@ -590,7 +577,6 @@ honest
 horizontal
 horrible
 hostile
-hot
 huge
 human
 humble
@@ -599,6 +585,7 @@ humongous
 humorless
 humorous
 hungry
+hypnotic
 icky
 icy
 ideal
@@ -622,7 +609,7 @@ implosive
 impolite
 important
 impossible
-impotent
+impromptu
 improper
 imprudent
 impulsive
@@ -633,7 +620,6 @@ inferior
 informal
 initial
 inner
-innocent
 instant
 intense
 interior
@@ -641,7 +627,6 @@ internal
 irate
 irregular
 irritable
-islamic
 isolated
 jawless
 jealous
@@ -659,7 +644,6 @@ keen
 kind
 kindred
 kinetic
-kissable
 known
 kooky
 kosher
@@ -712,7 +696,6 @@ luminous
 lumpish
 lunar
 lustrous
-lusty
 luxurious
 mad
 magic
@@ -721,14 +704,15 @@ magnetic
 magnificent
 main
 majestic
+makeshift
 male
 malformed
-mammary
+mandatory
 mangy
 manlike
+manly
 mannish
 manual
-many
 marine
 marital
 maritime
@@ -748,7 +732,6 @@ mighty
 mild
 military
 minimal
-minor
 mobile
 modern
 modest
@@ -758,13 +741,13 @@ molecular
 monetary
 moneyless
 monstrous
+moody
 moonlike
 moonlit
 moral
 mortuary
 mossy
 motive
-mountable
 mournful
 mousy
 movable
@@ -779,16 +762,13 @@ musty
 mutable
 mutual
 mysterious
-naked
 narrow
-nasty
 national
 native
 natural
 nautical
 naval
 nearby
-nearest
 neat
 negative
 negligent
@@ -813,7 +793,6 @@ numeric
 numerous
 nutlike
 nutty
-obedient
 objective
 oblivious
 oblong
@@ -830,6 +809,7 @@ odd
 official
 old
 ominous
+oncoming
 ongoing
 online
 onshore
@@ -839,7 +819,6 @@ open
 operable
 operative
 opposite
-oral
 orange
 ordinary
 organic
@@ -882,7 +861,6 @@ patient
 payable
 peaceful
 peculiar
-pediatric
 pending
 penniless
 perennial
@@ -924,7 +902,6 @@ prankish
 preachy
 precious
 precise
-pregnant
 prenatal
 preset
 pretty
@@ -942,6 +919,7 @@ pristine
 private
 proactive
 probable
+prodigal
 productive
 profane
 professional
@@ -985,7 +963,6 @@ reborn
 recent
 reckless
 reclusive
-rectal
 red
 referable
 refutable
@@ -1003,7 +980,6 @@ remindful
 remote
 removable
 renewable
-rentable
 repugnant
 repulsive
 reputable
@@ -1012,6 +988,7 @@ resistant
 resolute
 resonant
 responsible
+retinal
 reusable
 reverse
 revisable
@@ -1032,6 +1009,7 @@ rough
 round
 roundish
 routine
+roving
 royal
 rude
 runny
@@ -1066,7 +1044,6 @@ sectional
 secular
 secure
 sedate
-sedative
 seismic
 selective
 semantic
@@ -1074,14 +1051,12 @@ semisoft
 semisweet
 senior
 sensitive
-sensuous
 separate
 septic
 sequential
 serene
 serious
 sevenfold
-several
 severe
 shabby
 shady
@@ -1120,7 +1095,6 @@ skinless
 skinny
 skintight
 skyward
-slacker
 sleek
 sliceable
 slim
@@ -1158,6 +1132,7 @@ specific
 spendable
 spherical
 spiffy
+spinal
 spiny
 spirited
 spiritual
@@ -1181,7 +1156,6 @@ stark
 starless
 starlit
 starry
-statutory
 steadfast
 steadier
 steady
@@ -1208,7 +1182,6 @@ stubborn
 stuck
 stuffy
 stunning
-stupid
 sturdy
 suave
 subarctic
@@ -1218,13 +1191,11 @@ sublime
 subsonic
 substantial
 subtle
-such
 sudden
 sufficient
 suitable
 sullen
 sulphuric
-sultry
 super
 superior
 supreme
@@ -1262,8 +1233,8 @@ thirsty
 threefold
 tidal
 tidy
-tight
 timid
+tingly
 tiny
 tired
 top
@@ -1290,7 +1261,6 @@ twin
 twistable
 twisty
 typical
-ugly
 ultimate
 ultra
 unabashed
@@ -1335,7 +1305,6 @@ undated
 undaunted
 undecided
 undefined
-underage
 underarm
 underdone
 underfed
@@ -1387,6 +1356,7 @@ unisexual
 universal
 unkempt
 unkind
+unknowing
 unknown
 unlawful
 unleaded
@@ -1478,6 +1448,7 @@ untamed
 untapped
 untaxed
 untidy
+untimely
 untitled
 untoasted
 untold
@@ -1547,7 +1518,6 @@ venomous
 verbal
 verbose
 vertical
-very
 viable
 viewable
 viewless
@@ -1569,7 +1539,6 @@ warm
 washable
 wavy
 weak
-wet
 whacky
 whimsical
 whiny
@@ -1586,17 +1555,17 @@ wise
 wisplike
 wispy
 wistful
+wobbly
 womanless
+womanlike
 wooden
 woozy
 worrisome
-worst
 wriggly
 wrong
 wrongful
 yellow
 yonder
-young
 yummy
 zany
 zealous

@@ -24,7 +24,6 @@ awkward
 bare
 basic
 beautiful
-best
 better
 big
 bitter
@@ -37,7 +36,6 @@ boring
 brave
 brief
 bright
-brightly colored
 brisk
 broad
 broken
@@ -52,7 +50,6 @@ cautious
 central
 certain
 charming
-cheap
 cheerful
 circular
 classic
@@ -101,11 +98,9 @@ difficult
 digital
 dim
 direct
-dirty
 distant
 dizzy
 domestic
-dominant
 double
 dramatic
 dreadful
@@ -113,7 +108,6 @@ dreamy
 dry
 dual
 dull
-dumb
 eager
 early
 earnest
@@ -125,14 +119,12 @@ elegant
 empty
 energetic
 equal
-ethnic
 even
 eventual
 evil
 exact
 excessive
 exciting
-exotic
 expensive
 expert
 external
@@ -199,7 +191,6 @@ gross
 guilty
 handsome
 happy
-hard
 harsh
 healthy
 heavy
@@ -211,7 +202,6 @@ honest
 horizontal
 horrible
 hostile
-hot
 huge
 humble
 hungry
@@ -230,7 +220,6 @@ inferior
 informal
 initial
 inner
-innocent
 instant
 intense
 interior
@@ -288,7 +277,6 @@ mighty
 mild
 military
 minimal
-minor
 mobile
 modern
 modest
@@ -296,9 +284,7 @@ moral
 multiple
 mutual
 mysterious
-naked
 narrow
-nasty
 native
 natural
 naval
@@ -319,14 +305,12 @@ notable
 novel
 nuclear
 numerous
-obedient
 objective
 obvious
 odd
 official
 old
 open
-oral
 orange
 ordinary
 organic
@@ -357,7 +341,6 @@ powerful
 practical
 precious
 precise
-pregnant
 pretty
 previous
 primary
@@ -416,7 +399,6 @@ separate
 sequential
 serene
 serious
-several
 severe
 shallow
 sharp
@@ -463,7 +445,6 @@ striking
 strong
 stuck
 stunning
-stupid
 sturdy
 subjective
 substantial
@@ -488,7 +469,6 @@ thick
 thin
 thirsty
 tidy
-tight
 tiny
 tired
 top
@@ -503,7 +483,6 @@ tropical
 true
 twin
 typical
-ugly
 ultimate
 unable
 uncertain
@@ -543,7 +522,6 @@ voluntary
 vulnerable
 warm
 weak
-wet
 white
 whole
 wicked
@@ -553,7 +531,6 @@ wise
 wooden
 wrong
 yellow
-young
 zany
 zesty
 zippy

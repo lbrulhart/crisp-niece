@@ -11,11 +11,9 @@ afar
 agreeably
 ahead
 alike
-almost
 aloft
 alongside
 already
-alright
 also
 always
 amazingly
@@ -29,7 +27,6 @@ annually
 antiquely
 anxiously
 anyhow
-anymore
 anyplace
 anyway
 anywhere
@@ -124,9 +121,9 @@ duly
 durably
 eagerly
 easily
+eastward
 effectively
 efficiently
-either
 elegantly
 eligibly
 elsewhere
@@ -196,7 +193,6 @@ greedily
 groggily
 grossly
 gruffly
-grumbly
 grumpily
 happily
 hardly
@@ -204,7 +200,6 @@ harshly
 hastily
 hazily
 heavily
-hence
 highly
 honestly
 horribly
@@ -243,7 +238,6 @@ legally
 legibly
 lightly
 likely
-lilly
 literally
 lividly
 loosely
@@ -251,13 +245,10 @@ loudly
 lovingly
 luckily
 lushly
-lustfully
-lustily
 lyrically
 magically
 mainly
 majestically
-manly
 manually
 maturely
 maybe
@@ -290,7 +281,6 @@ nonetheless
 normally
 notably
 numbly
-obediently
 obviously
 occasionally
 oddly
@@ -345,15 +335,12 @@ quaintly
 quarterly
 quickly
 quietly
-quite
 radiantly
 randomly
 rapidly
 rarely
-rather
 readily
 really
-reapply
 reasonably
 recently
 regally
@@ -364,7 +351,6 @@ renewably
 repeatedly
 reputably
 respectfully
-resupply
 richly
 rightly
 roughly
@@ -379,7 +365,6 @@ secretly
 securely
 seemingly
 seldom
-sensually
 separately
 seriously
 severely
@@ -407,7 +392,6 @@ softly
 solely
 solidly
 somehow
-somewhat
 soon
 specially
 specifically
@@ -438,7 +422,6 @@ thinly
 thirstily
 thus
 tightly
-tingly
 together
 totally
 tragically
@@ -460,7 +443,6 @@ unjustly
 unluckily
 unnecessarily
 unsubtly
-untimely
 uphill
 upriver
 upstairs
@@ -475,7 +457,6 @@ vaguely
 variably
 vastly
 verbally
-very
 vexingly
 violently
 virtually
@@ -496,7 +477,6 @@ willingly
 wisely
 wonderfully
 wrongly
-yeah
 yearly
 yesterday
 zealously
