@@ -161,18 +161,17 @@ class PassphraseApp:
     def __init__(self, phrase_generator):
         self.generator = phrase_generator
 
-    @staticmethod
-    def handle_about(start_response):
+    def handle_about(self, start_response, base_path=''):
         status = '200 OK'
         headers = [('Content-type', 'text/html; charset=utf-8')]
         start_response(status, headers)
 
-        about_html = """<!DOCTYPE html>
+        about_html = f"""<!DOCTYPE html>
 <html>
 <head>
     <title>About - Secure Surreal Passphrases</title>
     <style>
-        body {
+        body {{
             margin: 0;
             padding: 0;
             background: #000;
@@ -181,13 +180,13 @@ class PassphraseApp:
             align-items: center;
             min-height: 100vh;
             flex-direction: column;
-        }
-        img {
+        }}
+        img {{
             max-width: 90vw;
             max-height: 90vh;
             object-fit: contain;
-        }
-        .back-link {
+        }}
+        .back-link {{
             position: fixed;
             top: 20px;
             left: 20px;
@@ -197,11 +196,11 @@ class PassphraseApp:
             text-decoration: none;
             border-radius: 5px;
             font-family: Arial, sans-serif;
-        }
-        .back-link:hover {
+        }}
+        .back-link:hover {{
             background: rgba(0, 86, 179, 0.9);
-        }
-        .about-text {
+        }}
+        .about-text {{
             color: #fff;
             font-family: Arial, sans-serif;
             max-width: 600px;
@@ -209,15 +208,15 @@ class PassphraseApp:
             line-height: 1.6;
             text-align: left;
             margin-top: 20px;
-        }
-        .about-text p {
+        }}
+        .about-text p {{
             margin-bottom: 1em;
-        }
+        }}
     </style>
 </head>
 <body>
-    <a href="/passphrase" class="back-link">← Back to Generator</a>
-    <img src="/passphrase/creator.png" alt="About the Creator">
+    <a href="{base_path}/" class="back-link">← Back to Generator</a>
+    <img src="{base_path}/creator.png" alt="About the Creator">
     <div class="about-text">
         <p>Built by someone who got tired of searching the internet for a decent passphrase generator and thought, "How hard could it be?"</p>
         <p>Turns out, pretty fun actually.</p>
@@ -337,7 +336,7 @@ class PassphraseApp:
 
         return '\n'.join(passphrase_items)
 
-    def render_main_page(self, params):
+    def render_main_page(self, params, base_path=''):
         complexity = params['complexity']
         separator = params['separator']
         add_number = params['add_number']
@@ -496,7 +495,7 @@ Each generation is completely random and independent.
 </div>
 
 <div style='margin-top: 20px; text-align: center; color: #666; font-size: 0.85em;'>
-<a href='/passphrase/about' style='color: #007bff; margin-right: 15px;'>About</a> |
+<a href='{base_path if base_path else ""}/about/' style='color: #007bff; margin-right: 15px;'>About</a> |
 Copyright &copy; 2026 | Licensed under <a href='https://opensource.org/licenses/MIT' style='color: #007bff;'>MIT License</a>
 </div>
 
@@ -504,10 +503,28 @@ Copyright &copy; 2026 | Licensed under <a href='https://opensource.org/licenses/
 </html>"""
         return body
 
+    @staticmethod
+    def handle_creator_image(start_response):
+        try:
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            image_path = os.path.join(script_dir, 'creator.png')
+            with open(image_path, 'rb') as f:
+                image_data = f.read()
+            start_response('200 OK', [('Content-type', 'image/png')])
+            return [image_data]
+        except FileNotFoundError:
+            start_response('404 Not Found', [('Content-type', 'text/plain')])
+            return [b'Image not found']
+
     def __call__(self, environ, start_response):
         path = environ.get('PATH_INFO', '')
-        if path.endswith('/about'):
-            return self.handle_about(start_response)
+        base_path = environ.get('SCRIPT_NAME', '')
+
+        if path.endswith('/about') or path.endswith('/about/'):
+            return self.handle_about(start_response, base_path)
+
+        if path.endswith('/creator.png'):
+            return self.handle_creator_image(start_response)
 
         client_ip = environ.get('REMOTE_ADDR', 'unknown')
         if self.generator.is_rate_limited(client_ip):
@@ -522,7 +539,7 @@ Copyright &copy; 2026 | Licensed under <a href='https://opensource.org/licenses/
 
         query_string = environ.get('QUERY_STRING', '')
         params = self.parse_query_params(query_string)
-        body = self.render_main_page(params)
+        body = self.render_main_page(params, base_path)
 
         return [body.encode("utf-8")]
 
