@@ -16,9 +16,9 @@ Your brain naturally creates mental images from grammatical sentences. The surre
 
 - **Grammar-based generation**: Creates passphrases using proper grammatical structure (adjectives, nouns, verbs, adverbs, prepositions)
 - **Customizable output**: Choose separator style (space, dash, CamelCase, none), add numbers, control capitalization, and select terminators
-- **Security-focused**: Uses cryptographically secure random generation (Python's `secrets` module)
+- **Security-focused**: Uses cryptographically secure random generation (the browser's `crypto.getRandomValues`)
 - **Entropy calculation**: Displays bits of entropy and human-readable strength for each passphrase
-- **Privacy-first**: No logging, no storage, no tracking - all generation happens server-side and results are never stored
+- **Privacy-first**: No logging, no storage, no tracking - all generation happens in your browser, so passphrases never reach the server
 - **Rate limiting**: 60 requests per minute per IP to prevent abuse
 - **Responsive design**: Works on desktop and mobile devices
 
@@ -74,10 +74,10 @@ sudo systemctl restart httpd
 
 ## Security
 
-- All randomness uses Python's `secrets` module (cryptographically secure)
+- All randomness uses the browser's `crypto.getRandomValues` (cryptographically secure), with rejection sampling so every word is equally likely
 - Entropy ranges from ~35 bits (Very Short) to 100+ bits (Extra Long)
 - 50+ bit passphrases would take billions of years to crack with current technology
-- No passphrases are logged, stored, or transmitted to third parties
+- Passphrases never leave the browser, so they can't be logged, stored, or transmitted to anyone
 - Rate limiting prevents automated attacks
 
 ## Word Lists

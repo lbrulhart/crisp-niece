@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Surreal passphrase generator — where crisp nieces promise ruin</title>
+<meta name="description" content="Strong passwords are hard to remember, and memorable passwords are usually weak. Surreal passphrases from random words are both. Generated in your browser.">
+<style>
+body { font-family: Arial, sans-serif; margin: 40px auto; padding: 0 40px; max-width: 1200px; }
+button { font-family: inherit; border: 0; cursor: pointer; }
+.buttons { margin: 20px 0; display: flex; flex-wrap: wrap; gap: 5px; }
+.buttons button { padding: 6px 14px; background: #007bff; color: white; border-radius: 5px; font-size: 14px; white-space: nowrap; }
+.buttons button:hover { background: #0056b3; }
+.buttons button.active { background: #28a745; pointer-events: none; cursor: default; }
+.options-table { margin: 20px 0; }
+.option-row { display: grid; grid-template-columns: 150px 1fr; align-items: center; margin: 6px 0; gap: 10px; }
+.option-row strong { text-align: right; padding-right: 15px; }
+.option-row .buttons { margin: 0; display: flex; gap: 5px; flex-wrap: wrap; }
+.top-buttons { margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; }
+.generate-btn { padding: 10px 30px; background: #28a745; color: white; border-radius: 5px; font-size: 16px; display: inline-block; }
+.generate-btn:hover { background: #218838; }
+.reset-btn { padding: 10px 30px; background: #6c757d; color: white; border-radius: 5px; font-size: 16px; display: inline-block; }
+.reset-btn:hover { background: #5a6268; }
+ul { list-style: none; padding: 0; }
+li { margin: 10px 0; padding: 10px; background: #f8f9fa; border-left: 4px solid #007bff; word-break: break-word; }
+.passphrase { font-size: 1.1em; user-select: all; cursor: pointer; display: inline-block; word-break: break-word; }
+.passphrase:hover { background: #e9ecef; padding: 2px 4px; margin: -2px -4px; border-radius: 3px; }
+.entropy { color: #666; font-size: 0.9em; margin-left: 10px; display: inline-block; }
+.copy-btn { margin-left: 10px; padding: 4px 8px; background: transparent; border: 1px solid #ddd; border-radius: 3px; font-size: 1.2em; }
+.copy-btn:hover { background: #f8f9fa; border-color: #007bff; }
+.copy-btn:active { background: #e9ecef; }
+
+@media (max-width: 768px) {
+  body { margin: 20px 10px; padding: 0; }
+  h1 { font-size: 1.5em; }
+  .option-row { grid-template-columns: 1fr; gap: 5px; }
+  .option-row strong { text-align: left; padding-right: 0; padding-bottom: 5px; }
+  .buttons:not(.option-row .buttons) { flex-direction: column; }
+  .buttons:not(.option-row .buttons) button { width: 100%; text-align: center; }
+  .buttons button { font-size: 13px; padding: 5px 10px; }
+  .generate-btn, .reset-btn { padding: 8px 20px; font-size: 14px; width: 100%; text-align: center; }
+  .top-buttons { flex-direction: column; }
+  .passphrase { font-size: 1em; }
+  .entropy { display: block; margin-left: 0; margin-top: 5px; }
+  li { padding: 8px; }
+}
+
+@media (max-width: 480px) {
+  body { margin: 15px 8px; }
+  h1 { font-size: 1.3em; }
+  .buttons button { font-size: 12px; padding: 4px 8px; }
+  .passphrase { font-size: 0.95em; }
+}
+</style>
+</head>
+<body>
+<h1>Secure Surreal Passphrases</h1>
+
+<div class="top-buttons">
+<button type="button" class="generate-btn" id="generate">Generate New</button>
+<button type="button" class="reset-btn" id="reset">Reset to Defaults</button>
+</div>
+
+<div class="buttons">
+<button type="button" data-opt="level" data-val="very_short">Very Short (3 words)</button>
+<button type="button" data-opt="level" data-val="short">Short (4 words)</button>
+<button type="button" data-opt="level" data-val="medium">Medium (4-5 words)</button>
+<button type="button" data-opt="level" data-val="long">Long (4-6 words)</button>
+<button type="button" data-opt="level" data-val="extralong">Extra Long (7-10 words)</button>
+</div>
+
+<div class="options-table">
+
+<div class="option-row">
+<strong>Capitalize:</strong>
+<div class="buttons">
+<button type="button" data-opt="cap" data-val="first">First</button>
+<button type="button" data-opt="cap" data-val="all">All</button>
+<button type="button" data-opt="cap" data-val="no">None</button>
+</div></div>
+
+<div class="option-row">
+<strong>Separator:</strong>
+<div class="buttons">
+<button type="button" data-opt="sep" data-val="space">Space</button>
+<button type="button" data-opt="sep" data-val="dash">Dash</button>
+<button type="button" data-opt="sep" data-val="camel">CamelCase</button>
+<button type="button" data-opt="sep" data-val="none">None</button>
+</div></div>
+
+<div class="option-row">
+<strong>Add Number:</strong>
+<div class="buttons">
+<button type="button" data-opt="num" data-val="no">No</button>
+<button type="button" data-opt="num" data-val="yes">Yes</button>
+</div></div>
+
+<div class="option-row">
+<strong>Terminator:</strong>
+<div class="buttons">
+<button type="button" data-opt="term" data-val="none">None</button>
+<button type="button" data-opt="term" data-val="period">Period</button>
+<button type="button" data-opt="term" data-val="symbol">Random Symbol</button>
+</div></div>
+
+</div>
+
+<noscript><p>This generator runs in your browser, so it needs JavaScript.</p></noscript>
+<ul id="phrases"></ul>
+
+<div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-left: 4px solid #007bff;">
+<h2 style="margin-top: 0; font-size: 1.2em;">Why Passphrases?</h2>
+<p style="margin: 10px 0;">
+Strong passwords are hard to remember, and memorable passwords are usually weak. Passphrases solve this problem by combining
+multiple random words into phrases that are both secure and memorable. This generator creates grammatically structured passphrases
+using a large vocabulary, resulting in high entropy (randomness) that makes them extremely difficult to crack.
+</p>
+<p style="margin: 10px 0;">
+Each passphrase's strength is measured in bits of entropy—a 50-bit passphrase would take billions of years to crack with
+current technology. The surreal combinations (like "Crisp niece promises ruin") are intentionally unusual, making them
+both memorable and secure. You can customize separators, capitalization, and add numbers or symbols to meet any password requirements.
+</p>
+<p style="margin: 10px 0; font-size: 0.9em; color: #666;">
+Built using words curated from the <a href="https://www.eff.org/document/passphrase-wordlists" target="_blank" style="color: #007bff;">EFF's passphrase wordlists</a>, organized by part of speech for grammatical structure. Thank you to the EFF for their excellent work on password security.
+</p>
+</div>
+
+<div style="margin-top: 20px; padding: 20px; background: #fff3cd; border-left: 4px solid #ffc107; font-size: 0.9em;">
+<strong>Privacy Notice:</strong> All passphrases are generated in your browser using cryptographically secure randomness.
+They never leave your device: nothing is <strong>sent to the server, logged, or stored</strong>.
+Each generation is completely random and independent.
+</div>
+
+<div style="margin-top: 30px; text-align: center;">
+<a href="https://www.buymeacoffee.com/lylebrulhart" target="_blank">
+<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 50px; border-radius: 5px;">
+</a>
+</div>
+
+<div style="margin-top: 20px; text-align: center; color: #666; font-size: 0.85em;">
+<a href="__BASE_PATH__/about/" style="color: #007bff; margin-right: 15px;">About</a> |
+Copyright &copy; 2026 | Licensed under <a href="https://opensource.org/licenses/MIT" style="color: #007bff;">MIT License</a>
+</div>
+
+<script type="application/json" id="words">__WORDS__</script>
+<script>
+const words = JSON.parse(document.getElementById('words').textContent)
+const orig_chance = 70
+const templates = {
+    very_short: [
+        ['adj', 'noun', 'verb'],
+        ['noun', 'verb', 'adv'],
+    ],
+    short: [
+        ['adj', 'noun', 'verb', 'adv'],
+        ['adj', 'noun', 'verb', 'noun'],
+        ['noun', 'verb', 'adj', 'noun'],
+    ],
+    medium: [
+        ['adj', 'noun', 'verb', 'adv'],
+        ['adj', 'noun', 'verb', 'adj', 'noun'],
+    ],
+    long: [
+        ['adj', 'noun', 'verb', 'adv'],
+        ['adj', 'noun', 'verb', 'adj', 'noun'],
+        ['adj', 'noun', 'verb', 'prep', 'adj', 'noun'],
+    ],
+    extralong: [
+        ['adj', 'noun', 'verb', 'noun', 'prep', 'adj', 'noun'],
+        ['adj', 'noun', 'verb', 'noun', 'adv', 'prep', 'adj', 'noun'],
+        ['adj', 'noun', 'verb', 'noun', 'prep', 'adj', 'noun', 'prep', 'adj', 'noun'],
+    ],
+}
+const symbols = ['!', '?', '@', '#', '$', '%', '&', '*']
+const separators = {space: ' ', dash: '-', camel: '', none: ''}
+const defaults = {level: 'long', sep: 'space', num: 'no', cap: 'first', term: 'none'}
+const copy_icon = '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2Z"/><path d="M2 6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1H6a3 3 0 0 1-3-3V6H2Z"/></svg>'
+const done_icon = '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>'
+const list = document.getElementById('phrases')
+let settings = read_settings()
+
+function rand_below(n)
+{
+    const limit = 2 ** 32 - 2 ** 32 % n
+    const b = new Uint32Array(1)
+    do
+    {
+        crypto.getRandomValues(b)
+    }
+    while (b[0] >= limit)
+    return b[0] % n
+}
+
+function choice(a)
+{
+    return a[rand_below(a.length)]
+}
+
+function capitalize(w)
+{
+    return w[0].toUpperCase() + w.slice(1)
+}
+
+function pick(pos)
+{
+    const [orig, large] = words[pos]
+    return choice(rand_below(100) < orig_chance ? orig : large)
+}
+
+function entropy(template)
+{
+    let bits = 0
+    for (const pos of template)
+    {
+        const [orig, large] = words[pos]
+        bits += Math.log2(orig.length * orig_chance / 100 + large.length * (100 - orig_chance) / 100)
+    }
+    return bits
+}
+
+function strength(bits)
+{
+    return bits < 35 ? 'moderate'
+        : bits < 50 ? 'strong'
+        : bits < 65 ? 'very strong'
+        : bits < 75 ? 'extremely strong'
+        : 'virtually uncrackable'
+}
+
+function make_phrase(template)
+{
+    let w = template.map(pick)
+    if (settings.sep === 'camel' || settings.cap === 'all')
+    {
+        w = w.map(capitalize)
+    } else if (settings.cap === 'first')
+    {
+        w[0] = capitalize(w[0])
+    }
+
+    let r = w.join(separators[settings.sep])
+    if (settings.num === 'yes')
+    {
+        r += `${settings.sep === 'space' ? ' ' : ''}${rand_below(9) + 1}`
+    }
+    if (settings.term === 'period')
+    {
+        r += '.'
+    } else if (settings.term === 'symbol')
+    {
+        r += choice(symbols)
+    }
+    return r
+}
+
+function read_settings()
+{
+    const q = new URLSearchParams(location.search)
+    const s = {}
+    for (const [k, d] of Object.entries(defaults))
+    {
+        const v = q.get(k) ?? ''
+        s[k] = document.querySelector(`[data-opt="${k}"][data-val="${CSS.escape(v)}"]`) ? v : d
+    }
+    return s
+}
+
+function save_settings()
+{
+    const q = new URLSearchParams()
+    for (const [k, v] of Object.entries(settings))
+    {
+        if (v !== defaults[k])
+        {
+            q.set(k, v)
+        }
+    }
+    const qs = q.toString()
+    history.replaceState(null, '', qs ? `?${qs}` : location.pathname)
+}
+
+function copy(button, text)
+{
+    navigator.clipboard.writeText(text).then(() =>
+    {
+        button.innerHTML = done_icon
+        setTimeout(() => button.innerHTML = copy_icon, 1500)
+    })
+}
+
+function render()
+{
+    for (const b of document.querySelectorAll('[data-opt]'))
+    {
+        b.classList.toggle('active', settings[b.dataset.opt] === b.dataset.val)
+    }
+
+    const items = []
+    for (let i = 0; i < 10; i++)
+    {
+        const template = choice(templates[settings.level])
+        const phrase = make_phrase(template)
+        const bits = entropy(template)
+        const li = document.createElement('li')
+        li.innerHTML = `<span class="passphrase"></span><button type="button" class="copy-btn" title="Copy to clipboard">${copy_icon}</button><span class="entropy">(~${Math.round(bits)} bits - ${strength(bits)})</span>`
+        li.querySelector('.passphrase').textContent = phrase
+        li.querySelector('.copy-btn').addEventListener('click', e => copy(e.currentTarget, phrase))
+        items.push(li)
+    }
+    list.replaceChildren(...items)
+}
+
+document.addEventListener('click', e =>
+{
+    const b = e.target.closest('[data-opt]')
+    if (!b)
+    {
+        return
+    }
+    settings[b.dataset.opt] = b.dataset.val
+    save_settings()
+    render()
+})
+
+document.getElementById('generate').addEventListener('click', render)
+
+document.getElementById('reset').addEventListener('click', () =>
+{
+    settings = {...defaults}
+    save_settings()
+    render()
+})
+
+render()
+</script>
+</body>
+</html>
