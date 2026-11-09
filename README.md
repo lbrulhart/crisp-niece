@@ -75,8 +75,8 @@ sudo systemctl restart httpd
 ## Security
 
 - All randomness uses the browser's `crypto.getRandomValues` (cryptographically secure), with rejection sampling so every word is equally likely
-- Entropy ranges from ~35 bits (Very Short) to 100+ bits (Extra Long)
-- 50+ bit passphrases would take billions of years to crack with current technology
+- Entropy ranges from ~29 bits (Very Short) to ~94 bits (Extra Long)
+- Every extra bit of entropy doubles the guesses an attacker needs. Around 50 bits holds up well where a site limits login attempts; for accounts that matter, use Extra Long (68+ bits)
 - Passphrases never leave the browser, so they can't be logged, stored, or transmitted to anyone
 - Rate limiting prevents automated attacks
 
