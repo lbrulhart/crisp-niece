@@ -10,7 +10,6 @@
 
 import os
 import secrets
-import sys
 import time
 from collections import defaultdict
 
@@ -307,13 +306,9 @@ class PassphraseApp:
     def generate_passphrases_html(self, params):
         passphrase_items = []
         template_list = self.generator.templates[params['complexity']]
-        print(
-            f"[DEBUG] Complexity: {params['complexity']}, Template pool size: {len(template_list)}, Templates: {template_list}",
-            file=sys.stderr)
 
         for i in range(10):
             template = secrets.choice(template_list)
-            print(f"[DEBUG] Passphrase {i + 1}: Selected template: {template}", file=sys.stderr)
             if params['terminator_type'] == 'symbol':
                 terminator = secrets.choice(['!', '?', '@', '#', '$', '%', '&', '*'])
             elif params['terminator_type'] == 'none':
@@ -327,7 +322,6 @@ class PassphraseApp:
                 params['capitalize_mode'],
                 terminator
             )
-            print(f"[DEBUG] Word sources: {', '.join(word_sources)}", file=sys.stderr)
             entropy = self.generator.calculate_entropy(template)
             description = self.generator.entropy_description(entropy)
             escaped_phrase = phrase.replace("'", "\\'")
@@ -351,7 +345,8 @@ class PassphraseApp:
         body = f"""<html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Secure Surreal Passphrases - where crisp nieces promise ruin</title>
+<title>Surreal passphrase generator — where crisp nieces promise ruin</title>
+<meta name="description" content="Strong passwords are hard to remember, and memorable passwords are usually weak. Surreal passphrases from random words are both. Nothing logged.">
 <style>
 body {{ font-family: Arial, sans-serif; margin: 40px; max-width: 1200px; margin-left: auto; margin-right: auto; }}
 .buttons {{ margin: 20px 0; display: flex; flex-wrap: wrap; gap: 5px; }}
